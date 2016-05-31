@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+
+  <meta name="description" content="Anketiranje hrvatskih korisnika Facebooka o parlamentarnim izborima 2015. godine.">
+  <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+<!--   {% block facebook_og_metadata %}
+  <meta property="og:title" content="Referendum 2013" />
+  <meta property="og:description" content="Odgovorite na referendumsko pitanje i saznajte koliko vaših prijatelja je glasalo Za ili Protiv !" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="http://referendum2013.hr" />
+  <meta property="og:image" content="http://referendum2013.hr/static/images/logo.png" />
+  <meta property="og:site_name" content="Referendum 2013" />
+  <meta property="fb:app_id" content="1407261166178158" />
+  {% endblock %} -->
+
+  <meta id="mediaSlideKeywords" name="keywords" content="sabor, 2015, izbori"></meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- <title>{% block title %}referendum2013.hr{% endblock %}</title> -->
+  <title>brexit2016</title>
+
+  <link rel="shortcut icon" href="static/images/sabor2015-favicon.ico" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+  <!-- <link rel="stylesheet" href="{{ STATIC_URL }}django_facebook/css/facebook.css" type="text/css" media="all" /> -->
+  <!-- <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" type="text/css" media="all" /> -->
+  <link rel="stylesheet" href="static/css/base.css" type="text/css" media="all" />
+
+  <script src="static/js/angular.min.js"></script>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <!-- // <script src="{{ STATIC_URL }}js/csrf.js"></script> -->
+
+  <script type="text/javascript">
+    // var current_vote = {{ vote }};
+    var global_results_raw = "-1";
+    var friends_results_raw = "-1";
+  </script>
+
+  <script src="static/js/functions.js"></script>
+
+  <!-- <script src="static/js/progress-chart.js"></script> -->
+
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/hr_HR/sdk.js#xfbml=1&version=v2.5&appId=444691295637078";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</head>
+<body>
+
+<div ng-app="brexit" ng-controller="brexitCtrl">
+
+  <div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+          data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span> 
+          <span class="icon-bar"></span> 
+          <span class="icon-bar"></span> 
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" >brexit2016</a>
+      </div>
+      <nav class="navbar-collapse bs-navbar-collapse collapse navbar-right" role="navigation" style="height: 1px;">
+<!--         {% if user.is_authenticated %}
+        <div class="nav navbar-nav navbar-right">
+          <a class="btn btn-default navbar-btn navbar-right"
+            href="{% url 'auth_logout' %}?next={{ request.path|urlencode }}">Odlogiraj
+            se, {{ user.first_name }} {{ user.last_name }}</a>
+        </div>
+        {% endif %} -->
+        <div class="fb-like navbar-btn" data-href="" data-width="10px" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+        <div class="fb-share-button navbar-btn" data-href="" data-layout="button_count"></div> 
+        <a class="btn btn-default navbar-btn" href="">Log off</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="row text-center">
+          <img src="static/images/brexit-logo.png" alt="brexit.oraclum.co.uk" class="header-logo" />
+          <!-- <progress-chart></progress-chart> -->
+        </div>
+      </div>
+
+      <div id="login" class="col-sm-8">
+        <div class="well">
+          <h2>Brexit 2016</h2>
+          <p class="lead">
+            Login through Facebook and find out how your friends and others will vote on Brexit 2016!
+          </p>
+          <!-- <form action="{% url 'facebook_connect' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" value="{{ request.path }}"  name="next" />
+            <p>
+              <a class="btn btn-lg btn-default" role="button" onclick="F.connect(this.parentNode.parentNode); return false;">
+            </p>
+          </form> -->
+          <a class="btn btn-lg btn-default" href="static/html/login.html" role="button">
+            Login through Facebook
+          </a>
+          <!-- <div class="fb-like" data-href="http://referendum2013.hr/" data-layout="standard" data-action="like" data-show-faces="false" data-share="false"></div>
+          <div class="fb-share-button" data-href="http://referendum2013.hr/" data-width="100" data-type="button_count" style="display: block"></div> -->
+        </div>
+
+        <!-- <p>Ukupni broj glasova: <span class="badge votes-all">{{ votes_count }}</span>
+        <span class="text-muted">(osvježavanje svakih 60 sekundi)</span><br>
+        Rezultate mogu vidjeti samo registrirani korisnici.
+        </p> -->
+        <p>Total votes: <span class="badge votes-all">555</span>
+        <span class="text-muted">(refresh every 60 seconds)</span><br>
+        Results are available only to registered users.
+        </p>
+
+<!--         <div class="panel panel-default">
+          <div class="panel-body text-disclaimer">
+            <h5>
+              <small>
+                <p class="muted">U svrhu ovoga istraživanja prikupljamo
+                  podatke o vašem stavu o referendumskom pitanju, kao i određene
+                  podatke s Facebooka (Facebook identifikacijski broj, godinu rođenja, lokaciju, spol i popis vaših
+                  prijatelja), čime želimo dobiti uvid u načine kako međusobna
+                  poznanstva utječu na stavove korisnika Facebooka. Vaš
+                  individualni odgovor na referendumsko pitanje i podaci o vašem
+                  profilu neće biti vidljivi drugim korisnicima, već će samo biti
+                  vidljiv anonimni prosjek odgovora. Jedino ćete vi vidjeti
+                  prosjek odgovora vaših prijatelja. Istraživači garantiraju da
+                  prikupljeni podaci neće biti korišteni ni u koje druge svrhe
+                  osim znanstveno-istraživačke. Prijavom na ovaj upitnik
+                  potvrđujete da ste suglasni s ovim pravilima korištenja.</p>
+              </small>
+            </h5>
+          </div>
+        </div> -->
+        
+      </div>
+
+    </div>
+  </div>
+
+
+<div class="container">
+
+</div>
+
+  <hr />
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h2>O projektu</h2>
+        <p>
+          U svrhu znanstvenog istraživanja prikupljamo podatke o izborima za Hrvatski sabor 2015. godine u Republici Hrvatskoj putem društvene mreže Facebook. Cilj istraživanja je utvrditi mogu li rezultati Facebook ankete biti svojom preciznošću sumjerljivi rezultatima tradicionalnih anketa te utvrditi kako međusobna poznanstva utječu na širenje informacija i stavove korisnika. Za više informacija pratite nas na našoj Facebook stranici <a href="https://www.facebook.com/sabor2015">https://www.facebook.com/sabor2015</a>.
+        </p>
+        <p>
+          <a class="btn btn-default" href="static/html/faq.html" role="button">
+            Često postavljana pitanja
+          </a>
+          <a class="btn btn-default" href="static/html/pravila-privatnosti.html" role="button">
+            Pravila privatnosti
+          </a>
+          <a class="btn btn-default" href="static/html/uvjeti-koristenja.html" role="button">
+            Uvjeti korištenja
+          </a>
+        </p>
+
+      </div>
+      <div class="col-md-6">
+        <h2>Autori projekta</h2>
+        <p>Ovaj projekt provodi se u sklopu znanstvenog istraživanja na temu širenja informacija na društvenim mrežama pod vodstvom doc.dr.sc. <a href="http://www.fer.unizg.hr/mile.sikic">Mile Šikića</a>. Izgradnja web sustava za prikupljanje podataka: Mladen Marinović, <a href="http://www.irb.hr/Ljudi/Matija-Piskorec">Matija Piškorec</a> i <a href="http://www.linkedin.com/pub/iva-miholi%C4%87/54/3b5/a50">Iva Miholić</a>. Suradnici za analizu rezultata ankete: Dejan Vinković i Vuk Vuković. Suradnik za analizu širenja informacija i mreže prijateljstava: <a href="http://www.irb.hr/Ljudi/Nino-Antulov-Fantulin">Nino Antulov-Fantulin</a>. Projekt je financiran iz vlastitih sredstava autora projekta. Kontakt osoba: Mile Šikić, sabor2015.hr@gmail.com
+        </p>
+      </div>
+    </div>
+
+
+    <hr />
+
+    <footer>
+      <p>brexit2016</p>
+    </footer>
+
+    <!-- <input type="hidden" id="global_results" value="{{ global_results }}"> -->
+  </div>
+
+</div>
+
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+
+  <!-- {% include 'django_facebook/_facebook_js.html' %} -->
+
+  <!-- <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-45993003-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script> -->
+
+</body>
+</html>

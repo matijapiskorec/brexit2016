@@ -1,0 +1,17 @@
+[
+    {
+        "auth": "",
+        "host": "172.17.42.1",
+        "keys_pattern": "*",
+        "name": "Hetzner",
+        "namespace_separator": ":",
+        "port": 6379,
+        "ssh_host": "78.46.233.162",
+        "ssh_password": "",
+        "ssh_port": 33128,
+        "ssh_private_key_path": "D:/IRB/key_78.46.233.162.pem",
+        "ssh_user": "root",
+        "timeout_connect": 60000,
+        "timeout_execute": 60000
+    }
+]
