@@ -1,7 +1,6 @@
 {
   "returning_user": true,
-  "region": "J",
-  "postcode": "ME72TP",
+  "region":{"constituency":"Argyll and Bute","region":"M"},
   "age_group": 1,
   "vote": "R",
   "meta1": 10,

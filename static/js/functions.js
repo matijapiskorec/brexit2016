@@ -179,18 +179,20 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
     $scope.totalNumberOfVotes = Math.floor(Math.random()*10000);
 
     // Get data on constituency and their corresponding regions
-    $http({url: "../data/constituency_region.json", method: 'GET'})
-      .success(function (data) {
-        $scope.constituency_region = data;
-        $scope.error = ''; // clear the error messages
-      })
-      .error(function (data, status) {
-        if (status === 404) {
-          $scope.error = 'Database not available!';
-        } else {
-          $scope.error = 'Error: ' + status;
-        }
-    });
+    $scope.getConstituencyRegion = function(url) {
+      $http({url: url, method: 'GET'})
+        .success(function (data) {
+          $scope.constituency_region = data;
+          $scope.error = ''; // clear the error messages
+        })
+        .error(function (data, status) {
+          if (status === 404) {
+            $scope.error = 'Database not available!';
+          } else {
+            $scope.error = 'Error: ' + status;
+          }
+      });
+    };
 
     $scope.getPostalCodes = function(url) {
       $http({url: url, method: 'GET'})
@@ -414,6 +416,7 @@ brexit.directive('questionMeta1', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
+        '<h3>Approximate the precentage of votes that <span id="vote-label-meta1">your option</span> will gain in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta1" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -421,9 +424,10 @@ brexit.directive('questionMeta1', function ($parse) {
         '<p id="meta-label1"></p>'
         );
 
+      // NOTE: It is impossible to select values close to the tick marks, so that's why we left only 0% and 100%
       $("#question-meta1").slider({
-        ticks: [0, 25, 50, 75, 100],
-        ticks_labels: ['0%', '25%', '50%', '75%', '100%'],
+        ticks: [0, 100], // ticks: [0, 25, 50, 75, 100],
+        ticks_labels: ['0%','100%'], // ticks_labels: ['0%', '25%', '50%', '75%', '100%'],
         ticks_snap_bounds: 1
       }
       );
@@ -436,7 +440,35 @@ brexit.directive('questionMeta1', function ($parse) {
         $('#meta-label1').text('You had chosen ' + e.value.newValue + '%.');
       });
 
-     scope.$watch('initial_user_info.meta1', function (newData, oldData) {
+     scope.$watchGroup(['user_info.vote','initial_user_info.vote'], function (newData, oldData) {
+
+        if (!newData[0] && !newData[1]) { return; }
+
+        var vote = newData[0] || newData[1];
+
+        console.log('#vote-label-meta1 = ' + vote);
+
+        var voteParsed = '<span style="color:' + 
+                          (vote=='R' ? '#4575b4' : '#f11b1b') +
+                         '">' + scope.codeToVote[vote].toUpperCase() + '</span>';
+
+        $('#vote-label-meta1').html(voteParsed);
+
+      });
+
+      scope.$watchGroup(['user_info.region','initial_user_info.region'], function (newData, oldData) {
+
+        if (!newData[0] && !newData[1]) { return; }
+
+        var region = newData[0] || newData[1];
+
+        console.log('#region-label-meta1 = ' + scope.codeToRegion[region.region]);
+
+        $('#region-label-meta1').html(scope.codeToRegion[region.region]);
+
+      });
+
+      scope.$watch('initial_user_info.meta1', function (newData, oldData) {
 
         if (!newData) { return; }
 
@@ -458,6 +490,7 @@ brexit.directive('questionMeta2', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
+        '<h3>Approximate the precentage of votes that <span id="vote-label-meta2">your option</span> will gain in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta2" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -465,9 +498,10 @@ brexit.directive('questionMeta2', function ($parse) {
         '<p id="meta-label2"></p>'
         );
 
+      // NOTE: It is impossible to select values close to the tick marks, so that's why we left only 0% and 100%
       $("#question-meta2").slider({
-        ticks: [0, 25, 50, 75, 100],
-        ticks_labels: ['0%', '25%', '50%', '75%', '100%'],
+        ticks: [0, 100], // ticks: [0, 25, 50, 75, 100],
+        ticks_labels: ['0%','100%'], // ticks_labels: ['0%', '25%', '50%', '75%', '100%'],
         ticks_snap_bounds: 1
       }
       );
@@ -478,6 +512,34 @@ brexit.directive('questionMeta2', function ($parse) {
       
       $("#question-meta2").on('change', function(e) {
         $('#meta-label2').text('You had chosen ' + e.value.newValue + '%.');
+      });
+
+     scope.$watchGroup(['user_info.vote','initial_user_info.vote'], function (newData, oldData) {
+
+        if (!newData[0] && !newData[1]) { return; }
+
+        var vote = newData[0] || newData[1];
+
+        console.log('#vote-label-meta2 = ' + vote);
+
+        var voteParsed = '<span style="color:' + 
+                          (vote=='R' ? '#4575b4' : '#f11b1b') +
+                         '">' + scope.codeToVote[vote].toUpperCase() + '</span>';
+
+        $('#vote-label-meta2').html(voteParsed);
+
+      });
+
+      scope.$watchGroup(['user_info.region','initial_user_info.region'], function (newData, oldData) {
+
+        if (!newData[0] && !newData[1]) { return; }
+
+        var region = newData[0] || newData[1];
+
+        console.log('#region-label-meta2 = ' + scope.codeToRegion[region.region]);
+
+        $('#region-label-meta2').html(scope.codeToRegion[region.region]);
+
       });
 
      scope.$watch('initial_user_info.meta2', function (newData, oldData) {
@@ -516,10 +578,12 @@ brexit.directive('buttonVote', function ($parse) {
         // TODO: UNDER ONE SESSION, USER CAN SUBMIT AS MANY ANSWERS AS HE WANTS, EVEN IF THEY ARE ALL THE SAME! 
         // TODO: IF USER CHANGES HIS VOTE AND THEN RETURNS THE OLD VALUES BEFORE SUBMITTING, HE WILL BE ABLE TO SUBMIT ALTHOUGH ANSWERS ARE THE SAME!
 
+        // (scope.user_info.postcode || scope.initial_user_info.postcode ) && 
+        // (scope.postcode_check.status == 200) && // postcode should be validated through postcode.io
+        //  (scope.user_info.region || scope.initial_user_info.region ) && // ( !(typeof scope.user_info.region === "undefined") || !(typeof scope.initial_user_info.region === "undefined") ) && // region should be defined
+
         if ( (scope.user_info.age_group || scope.initial_user_info.age_group ) && // age_group should be defined
-             (scope.user_info.postcode || scope.initial_user_info.postcode ) && 
-             (scope.postcode_check.status == 200) && // postcode should be validated through postcode.io
-             (scope.user_info.region || scope.initial_user_info.region ) && // ( !(typeof scope.user_info.region === "undefined") || !(typeof scope.initial_user_info.region === "undefined") ) && // region should be defined
+             ( !(typeof scope.user_info.region === "undefined") || !(typeof scope.initial_user_info.region === "undefined") ) && // region should be defined             
              (scope.user_info.vote || scope.initial_user_info.vote ) && // vote should be defined
              (scope.user_info.meta1 || scope.user_info.meta1==0 || scope.initial_user_info.meta1 || scope.initial_user_info.meta1==0 ) && // meta1 should be defined, but it could also be 0
              (scope.user_info.meta2 || scope.user_info.meta2==0 || scope.initial_user_info.meta2 || scope.initial_user_info.meta2==0 ) && // meta2 should be defined, but it could also be 0
@@ -529,7 +593,7 @@ brexit.directive('buttonVote', function ($parse) {
           // All values which are not set by the user in this session should be taken from initialization
           var age_group = scope.user_info.age_group ? scope.user_info.age_group : scope.initial_user_info.age_group;
           var region = scope.user_info.region ? scope.user_info.region : scope.initial_user_info.region;
-          var postcode = scope.user_info.postcode ? scope.user_info.postcode : scope.initial_user_info.postcode;
+          // var postcode = scope.user_info.postcode ? scope.user_info.postcode : scope.initial_user_info.postcode;
           var vote = scope.user_info.vote ? scope.user_info.vote : scope.initial_user_info.vote;
           var meta1 = scope.user_info.meta1 || scope.user_info.meta1==0 ? scope.user_info.meta1 : scope.initial_user_info.meta1;
           var meta2 = scope.user_info.meta2 || scope.user_info.meta2==0 ? scope.user_info.meta2 : scope.initial_user_info.meta2;
@@ -538,13 +602,12 @@ brexit.directive('buttonVote', function ($parse) {
                            (vote=='R' ? '#4575b4' : '#f11b1b') +
                            '">' + scope.codeToVote[vote].toUpperCase() + '</span>'
 
-          // $('#current-vote-label').text('You vote to ' + vote + ' (constituency "' + region.constituency + '" (region "' + region.region + '"), age ' + age_group + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
-          $('#current-vote-label').html('You vote to ' + voteParsed + ' (postcode ' + postcode + ', region "' + scope.codeToRegion[region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
+          $('#current-vote-label').html('You vote to ' + voteParsed + ' (constituency "' + region.constituency + '", region "' + scope.codeToRegion[region.region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
+          // $('#current-vote-label').html('You vote to ' + voteParsed + ' (postcode ' + postcode + ', region "' + scope.codeToRegion[region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
         
           user_vote({'vote': vote, 
                      'age_group': age_group,
-                     'region': region,
-                     'postcode': postcode,
+                     'region': region, // 'postcode': postcode,
                      'meta1': meta1,
                      'meta2': meta2
                     });
@@ -557,9 +620,8 @@ brexit.directive('buttonVote', function ($parse) {
 
       var user_vote = function (d) {
 
-        // var list_name = _.pluck(_.where(scope.election_regions,{'list_id':Number(d.list)}), 'parties');
-        // console.log('You vote to ' + d.vote + ' (constituency "' + d.region.constituency + '" (region "' + d.region.region + '"), age ' + d.age_group + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
-        console.log('You vote to ' + scope.codeToVote[d.vote] + ' (postcode ' + d.postcode + ', region "' + scope.codeToRegion[d.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
+        console.log('You vote to ' + scope.codeToVote[d.vote] + ' (constituency "' + d.region.constituency + '", region "' + scope.codeToRegion[d.region.region] + '"), age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
+        // console.log('You vote to ' + scope.codeToVote[d.vote] + ' (postcode ' + d.postcode + ', region "' + scope.codeToRegion[d.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
 
         scope.sendAnswers("api/send_answers",d);
 
@@ -1092,9 +1154,10 @@ brexit.directive('findRegion', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-      '<input id="region-input" class="typeahead" type="text" placeholder="Postal code">'
+      '<input id="region-input" class="typeahead" type="text" placeholder="Start typing your constituency...">'
       );
 
+      scope.getConstituencyRegion(attrs.url);
 
       scope.$watch('constituency_region', function (newData, oldData) {
 
@@ -1116,13 +1179,13 @@ brexit.directive('findRegion', function ($parse) {
           {
             name: 'constituency_region',
             //display: 'region',
-            display: function(d){return d.constituency + ' (region ' + d.region + ')';},
+            display: function(d){return d.constituency + ' (region ' + scope.codeToRegion[d.region] + ')';},
             source: constituency_region,
               templates: {
-                suggestion: function(d){return '<div><strong>' + d.constituency + '</strong> (region ' + d.region+ ')</div>';}
+                suggestion: function(d){return '<div><strong>' + d.constituency + '</strong> (region ' + scope.codeToRegion[d.region] + ')</div>';}
               }
           }).on('typeahead:selected', function(event, data){            
-                console.log('Region set to ' + data.region + ' (constituency ' + data.constituency + ')');   
+                console.log('Region set to ' + scope.codeToRegion[data.region] + ' (constituency ' + data.constituency + ')');   
                 scope.setRegion(data);     
             });
 
@@ -1133,7 +1196,7 @@ brexit.directive('findRegion', function ($parse) {
         if (!newData) { return; }
 
         $('#region-input').data(newData);
-        $('#region-input').val(newData.constituency + ' (region ' + newData.region+ ')');
+        $('#region-input').val(newData.constituency + ' (region ' + scope.codeToRegion[newData.region] + ')');
         
       });
 

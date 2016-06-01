@@ -26,9 +26,9 @@
 <!-- <link rel="stylesheet"
   href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css"> -->
 
+<link rel="stylesheet" href="../css/bootstrap-slider.css" type="text/css" media="all" />
 <link rel="stylesheet" href="../css/base.css" type="text/css" media="all" />
 <link rel="stylesheet" href="../css/charts.css" type="text/css" media="all" />
-<link rel="stylesheet" href="../css/bootstrap-slider.css" type="text/css" media="all" />
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.css" />
 
@@ -78,7 +78,7 @@ document.cookie = "csrf_token=SuperSecretToken123";
 
   <div class="container">   
     <div class="row text-center">
-      <img src="../images/brexit-logo.png" alt="sabor2015.hr" class="header-logo" />
+      <img src="../images/brexit-logo-v2.png" alt="brexit.oraclum.co.uk" class="header-logo" />
     </div>
   </div>
 
@@ -95,12 +95,18 @@ document.cookie = "csrf_token=SuperSecretToken123";
         <age-group></age-group>
       </div>
 
-      <div class="col-md-6">
-        <h3>Your region</h3>
+<!--       <div class="col-md-6">
+        <h3>Your region (postcodes)</h3>
         <p>Postal codes are validated through <a href="https://postcodes.io/">postcodes.io</a></p>
         <find-region2 url="../data/postcode-region-lookup.json"></find-region2>
-      </div>
+      </div> -->
 
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Your region</h3>
+          <find-region url="../data/constituency_region.json"></find-region>
+        </div>
+      </div>
 
     </div>
 
@@ -113,14 +119,14 @@ document.cookie = "csrf_token=SuperSecretToken123";
 
     <div class="row">
       <div class="col-md-12">
-        <h3>Approximate the precentage of votes that your option will gain in your region ON THE ACTUAL REFERENDUM.</h3>
+        <!-- <h3>Approximate the precentage of votes that your option will gain in your region ON THE ACTUAL REFERENDUM.</h3> -->
         <question-meta1></question-meta1>
       </div>
     </div>
     
     <div class="row">
       <div class="col-md-12">
-        <h3>Approximate the precentage of votes that your option will gain in your region ON THIS POLL.</h3>
+<!--         <h3>Approximate the precentage of votes that your option will gain in your region ON THIS POLL.</h3> -->
         <question-meta2></question-meta2>
       </div>
     </div>
