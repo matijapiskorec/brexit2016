@@ -1,0 +1,92 @@
+
+
+For returning users so that we can reconstruct all previous answers on frontend (this is also the same data that I will send you when user submits his answer):
+
+user_info
+
+{
+  "region":{"constituency":"Argyll and Bute","region":"M"},
+  "age_group": 1,
+  "vote": "R",
+  "meta1": 45,
+  "meta2": 12
+}
+
+Codes for vote: "R", "L"
+Codes for age_group: 0,1,2,3,4
+
+Codes for regions:
+
+{
+  "C": "North East England",
+  "D": "North West England",
+  "E": "Yorkshire and Humberside",
+  "F": "East Midlands",
+  "G": "West Midlands",
+  "H": "East of England",
+  "I": "Greater London",
+  "J": "South East England",
+  "K": "South West England",
+  "L": "Wales",
+  "M": "Scotland",
+  "N": "Northern Ireland"
+};
+
+
+In sabor2015.hr you also sent this for returning users, although we probably decided to inject some of these data through templating engine:
+
+{
+  "friend_count": 51,
+  "rank_friends": 229,
+  "reach": 8,
+  "reach_rank": 61,
+  "total_reach": 12
+}
+
+
+Statistics for visualizations...
+
+
+votes_users
+
+{
+  "global_votes": {"R": 1233, "L": 1265},
+  "friends_votes": {"R": 94, "L": 120}
+}
+
+
+votes_in_time
+
+[
+  {"R": 193, "L": 193, "time": "2015-11-03 12:00:00"}, 
+  {"R": 119, "L": 119, "time": "2015-11-03 13:00:00"}, 
+  {"R": 115, "L": 115, "time": "2015-11-03 14:00:00"}, 
+  {"R": 152, "L": 152, "time": "2015-11-03 15:00:00"}, 
+  {"R": 124, "L": 124, "time": "2015-11-03 16:00:00"}, 
+  {"R": 97, "L": 97, "time": "2015-11-03 17:00:00"}, 
+  {"R": 76, "L": 76, "time": "2015-11-03 18:00:00"}, 
+  {"R": 78, "L": 78, "time": "2015-11-03 19:00:00"}, 
+  {"R": 59, "L": 59, "time": "2015-11-03 20:00:00"}
+]
+
+
+votes_regions
+
+[
+  {"region": "C", "R": 78, "L": 334},
+  {"region": "D", "R": 544, "L": 65},
+  {"region": "E", "R": 234, "L": 344},
+  {"region": "F", "R": 45, "L": 314},
+  {"region": "G", "R": 344, "L": 223},
+  {"region": "H", "R": 344, "L": 324},
+  {"region": "I", "R": 835, "L": 334},
+  {"region": "J", "R": 224, "L": 857},
+  {"region": "K", "R": 713, "L": 324},
+  {"region": "L", "R": 125, "L": 82},
+  {"region": "M", "R": 536, "L": 334},
+  {"region": "N", "R": 332, "L": 112}
+]
+
+
+
+

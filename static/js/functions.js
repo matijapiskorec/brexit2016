@@ -4,6 +4,8 @@ var brexit = angular.module('brexit', []);
 brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
 
     $scope.user_info = {};
+    // $scope.user_info = {'meta1':0,'meta2':0};
+    // $scope.initial_user_info = {'meta1':0,'meta2':0};
 
     $scope.codeToRegion = {
           'C': 'North East England',
@@ -68,27 +70,11 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       $scope.$apply();
     };
 
-    // Generic function for retrieving data
-    $scope.getTotalVotes = function(url) {
+    $scope.getVotes = function(url) {
       $http({url: url, method: 'GET'})
         .success(function (data) {
-          $scope.total_votes = data;
-          $scope.error = ''; // clear the error messages
-
-        })
-        .error(function (data, status) {
-          if (status === 404) {
-            $scope.error = 'Database not available!';
-          } else {
-            $scope.error = 'Error: ' + status;
-          }
-        });
-    };
-
-    $scope.getFriendsVotes = function(url) {
-      $http({url: url, method: 'GET'})
-        .success(function (data) {
-          $scope.friends_votes = data;
+          $scope.total_votes = data.global_votes;
+          $scope.friends_votes = data.friends_votes;
           $scope.error = ''; // clear the error messages
 
         })
@@ -139,9 +125,10 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
 
           if (data.returning_user) {
             $('#results').show(1000);
+            $scope.getVotes("../data/votes_users.json");
+
             $scope.getVotesInTime("../data/votes_in_time.json");
-            $scope.getTotalVotes("../data/total_votes.json");
-            $scope.getFriendsVotes("../data/friends_votes.json");
+            $scope.getVotesRegions("../data/votes_regions.json");
           }
 
         })
@@ -164,6 +151,21 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       $http({url: url, method: 'GET'})
         .success(function (data) {
           $scope.votes_in_time = data;
+          $scope.error = ''; // clear the error messages
+        })
+        .error(function (data, status) {
+          if (status === 404) {
+            $scope.error = 'Database not available!';
+          } else {
+            $scope.error = 'Error: ' + status;
+          }
+        });
+    };
+
+    $scope.getVotesRegions = function(url) {
+      $http({url: url, method: 'GET'})
+        .success(function (data) {
+          $scope.votes_regions = data;
           $scope.error = ''; // clear the error messages
         })
         .error(function (data, status) {
@@ -440,6 +442,9 @@ brexit.directive('questionMeta1', function ($parse) {
         $('#meta-label1').text('You had chosen ' + e.value.newValue + '%.');
       });
 
+      // // Set initial value to zero (this is also valid and can be submitted!)
+      // scope.setMeta1(0);
+
      scope.$watchGroup(['user_info.vote','initial_user_info.vote'], function (newData, oldData) {
 
         if (!newData[0] && !newData[1]) { return; }
@@ -513,6 +518,9 @@ brexit.directive('questionMeta2', function ($parse) {
       $("#question-meta2").on('change', function(e) {
         $('#meta-label2').text('You had chosen ' + e.value.newValue + '%.');
       });
+
+      // // Set initial value to zero (this is also valid and can be submitted!)
+      // scope.setMeta2(0);
 
      scope.$watchGroup(['user_info.vote','initial_user_info.vote'], function (newData, oldData) {
 
@@ -613,7 +621,7 @@ brexit.directive('buttonVote', function ($parse) {
                     });
         }
         else {
-          $('#current-vote-label').html('<span style="color:red">Please fill in all the answers and check the validity of postcode!</span>');
+          $('#current-vote-label').html('<span style="color:red">Please fill in all the answers!</span>');
         }
 
       });
@@ -626,10 +634,13 @@ brexit.directive('buttonVote', function ($parse) {
         scope.sendAnswers("api/send_answers",d);
 
         $('#results').show(1000);
-        scope.getVotesInTime("../data/votes_in_time.json");
 
-        scope.getTotalVotes("../data/total_votes.json");
-        scope.getFriendsVotes("../data/friends_votes.json");
+        scope.getVotes("../data/votes_users.json");
+        // scope.getTotalVotes("../data/total_votes.json");
+        // scope.getFriendsVotes("../data/friends_votes.json");
+
+        scope.getVotesInTime("../data/votes_in_time.json");
+        scope.getVotesRegions("../data/votes_regions.json");
 
         // // TODO: Here goes ajax call!
         // var data = 'vote=' + vote_value;
@@ -731,12 +742,12 @@ brexit.directive('percentageTotal', function ($parse) {
           .attr("d", arc_zero)
           .classed("prazan");
 
-        var sum_of_votes = votes.remain + votes.leave;
+        var sum_of_votes = votes.R + votes.L;
 
         if (sum_of_votes >= 3) {
 
-          var ratio_leave = votes.leave / sum_of_votes;
-          var ratio_remain = votes.remain / sum_of_votes;
+          var ratio_leave = votes.L / sum_of_votes;
+          var ratio_remain = votes.R / sum_of_votes;
 
           var percentage_leave = Math.round(ratio_leave * 100);
           var percentage_remain = 100 - percentage_leave;
@@ -900,12 +911,12 @@ brexit.directive('percentageFriends', function ($parse) {
           .attr("d", arc_zero)
           .classed("prazan");
 
-        var sum_of_votes = votes.remain + votes.leave;
+        var sum_of_votes = votes.R + votes.L;
 
         if (sum_of_votes >= 3) {
 
-          var ratio_leave = votes.leave / sum_of_votes;
-          var ratio_remain = votes.remain / sum_of_votes;
+          var ratio_leave = votes.L / sum_of_votes;
+          var ratio_remain = votes.R / sum_of_votes;
 
           var percentage_leave = Math.round(ratio_leave * 100);
           var percentage_remain = 100 - percentage_leave;
@@ -1062,11 +1073,11 @@ brexit.directive('votesInTime', function ($parse) {
 
         var line_remain = d3.svg.line()
             .x(function(d) { return x(d.time); })
-            .y(function(d) { return y(d.remain); });
+            .y(function(d) { return y(d.R); });
 
         var line_leave = d3.svg.line()
             .x(function(d) { return x(d.time); })
-            .y(function(d) { return y(d.leave+40); });
+            .y(function(d) { return y(d.L+40); });
 
         $(element).html(
           '<div id="votes-in-time"></div>'
@@ -1081,7 +1092,7 @@ brexit.directive('votesInTime', function ($parse) {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         x.domain(d3.extent(data, function(d) { return d.time; }));
-        y.domain(d3.extent(data, function(d) { return Math.max(d.remain,d.leave); }));
+        y.domain(d3.extent(data, function(d) { return Math.max(d.R,d.L); }));
 
         svg.append("g")
             .attr("class", "x axis")
@@ -1340,47 +1351,49 @@ brexit.directive('mapStatistics', function ($parse) {
     replace: false,
     link: function (scope, element, attrs) {
 
-      var votes_regions = [
-        {'region':'North East England','percentage':78},
-        {'region':'North West England','percentage':54},
-        {'region':'Yorkshire and Humberside','percentage':12},
-        {'region':'East Midlands','percentage':45},
-        {'region':'West Midlands','percentage':65},
-        {'region':'East of England','percentage':34},
-        {'region':'Greater London','percentage':85},
-        {'region':'South East England','percentage':24},
-        {'region':'South West England','percentage':73},
-        {'region':'Scotland','percentage':56},
-        {'region':'Wales','percentage':15},
-        {'region':'Northern Ireland','percentage':32}
-      ];
-
       var region_selectors = {
-        'North East England':'#North_East_England',
-        'North West England':'#North_West_England',
-        'Yorkshire and Humberside':'#Yorkshire_and_the_Humber',
-        'East Midlands':'#East_Midlands',
-        'West Midlands':'#West_Midlands',
-        'East of England':'#East_of_England',
-        'Greater London':'#London',
-        'South East England':'#South_East_England',
-        'South West England':'#South_West_England, #path4481',
-        'Scotland':'#shetlands-orkneys-frame, #g8329 path',
-        'Wales':'#Wales',
-        'Northern Ireland':'#Northern_Ireland',
+        'C':'#North_East_England',
+        'D':'#North_West_England',
+        'E':'#Yorkshire_and_the_Humber',
+        'F':'#East_Midlands',
+        'G':'#West_Midlands',
+        'H':'#East_of_England',
+        'I':'#London',
+        'J':'#South_East_England',
+        'K':'#South_West_England, #path4481',
+        'L':'#Wales',
+        'M':'#shetlands-orkneys-frame, #g8329 path',
+        'N':'#Northern_Ireland',
       };
 
+      scope.$watch('votes_regions', function (newData, oldData) {
 
-      d3.xml("../../data/UK_European_Parliament_constituency_plain_small_white_legend.svg", "image/svg+xml", function(error, xml) {
-        if (error) throw error;
+        if (!newData) { return; }
 
-        $(element).html(xml.documentElement);
+        var votes_regions = newData;
 
-        var color = d3.scale.linear()
-                    .domain([0, 50, 100])
-                    .range(["#4575b4", "white", "#d73027"]);
+        d3.xml("../../data/UK_European_Parliament_constituency_plain_small_white_legend.svg", "image/svg+xml", function(error, xml) {
+          if (error) throw error;
 
-        _.map(votes_regions,function(d){d3.selectAll(region_selectors[d.region]).style('fill',color(d.percentage));})
+          $(element).html(xml.documentElement);
+
+          var color = d3.scale.linear()
+                      .domain([0, 50, 100])
+                      .range(["#4575b4", "white", "#d73027"]);
+
+          // _.map(votes_regions,function(d){d3.selectAll(region_selectors[d.region]).style('fill',color(d.percentage));});
+
+          _.map(votes_regions, function(d){
+      
+              var ratio_leave = d.L / (d.R + d.L);
+              var percentage_leave = Math.round(ratio_leave * 100);
+              var percentage_remain = 100 - percentage_leave;
+
+              d3.selectAll(region_selectors[d.region])
+                .style('fill',color(percentage_leave));
+          });
+
+        });
 
       });
 
