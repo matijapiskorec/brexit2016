@@ -30,9 +30,9 @@
      inkscape:window-height="1018"
      id="namedview111"
      showgrid="false"
-     inkscape:zoom="2.7895109"
-     inkscape:cx="307.45016"
-     inkscape:cy="510.0438"
+     inkscape:zoom="0.98624104"
+     inkscape:cx="361.6875"
+     inkscape:cy="407.53772"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="0"
@@ -500,4 +500,15 @@
        id="tspan3888-8"
        y="203.09068"
        x="299.27731">0%</tspan></text>
+  <text
+     sodipodi:linespacing="125%"
+     style="font-size:8.70965099px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Lato;-inkscape-font-specification:Lato"
+     xml:space="preserve"
+     id="text3886-1"
+     y="99.663612"
+     x="283.87466"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial"
+       id="tspan3888-7"
+       y="99.663612"
+       x="283.87466">Leave votes</tspan></text>
 </svg>

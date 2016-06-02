@@ -36,3 +36,22 @@ polyline{
   fill: none;
 }
 
+
+#div1 .dygraph-legend {
+          width: 200px;
+          background-color: transparent !important;
+          left: 80px !important;
+          top: 10px !important;
+        }
+#div2 .dygraph-legend {
+          width: 900px !important;
+          background-color: transparent !important;
+          left: 60px !important;
+          top: 4px !important;
+        }
+#div3 .dygraph-legend {
+          width: 900px !important;
+          background-color: transparent !important;
+          left: 60px !important;
+          top: 4px !important;
+        }

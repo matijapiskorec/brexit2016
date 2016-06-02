@@ -1130,7 +1130,7 @@ brexit.directive('votesInTime', function ($parse) {
 
         // draw legend
         var legend = svg.selectAll(".legend")
-            .data([{'label':'remain','color':'#d73027'},{'label':'leave','color':'#4575b4'}])
+            .data([{'label':'remain','color':'#4575b4'},{'label':'leave','color':'#d73027'}])
           .enter().append("g")
             .attr("class", "legend")
             .attr("transform", function(d, i) { return "translate(0," + (height-110 - i*20) + ")"; });
@@ -1397,6 +1397,272 @@ brexit.directive('mapStatistics', function ($parse) {
 
       });
 
+
+    }};
+
+}); 
+
+
+brexit.directive('predictions', function ($parse) {
+  return {
+    restrict: 'E',
+    replace: false,
+    link: function (scope, element, attrs) {
+
+      $(element).html(
+        '<p>' +
+          '<b>Current chances of different voting results:</b>' +
+          '<div id="div1" style="width:900px; height:150px;"></div>' +
+        '</p>' +
+        '<p>' +
+          '<b>Timeline of the most probable result:</b>' +
+          '<div id="div2" style="width:900px; height:250px;"></div>' +
+        '</p>' +
+        '<p>' +
+          '<b>Timeline of probabilities for REMAIN and LEAVE:</b>' +
+          '<div id="div3" style="width:900px; height:250px;"></div>' +
+        '</p>'
+      );
+
+      var remainBlueShade = '#4575b4';
+      var leaveRedShade = '#f11b1b';
+
+      var m_names = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      // "../data/
+
+      g1 = new Dygraph(
+          document.getElementById("div1"),
+          attrs.pathToData + "brexit-probability.csv", {
+            drawCallback: function(g, is_initial) {
+                if (!is_initial) {return;};
+                // pronadji poziiju tocke Average
+                var pozicija=0;
+                for (var i = 0; i < g.rawData_.length; i++) {
+                   if (!isNaN(g.layout_.points[2][i].canvasy)) {
+                     pozicija=g.layout_.points[2][i].xval;
+                     };
+                };
+                if (pozicija<50) {boja=remainBlueShade;}
+                else {boja=leaveRedShade;}
+                var r="";
+                var l="";
+                if (pozicija<=50.0) {r=" Result: REMAIN";}
+                if (pozicija>=50.0) {l=" Result: LEAVE";}
+                g.setAnnotations([{
+                    series: 'Average',
+                    x: pozicija+2,
+                    shortText: 'Average votes for Brexit='+pozicija+'%'+r+l,
+                    width: 200,
+                    height: 50,
+                    color: boja,
+                    text: ''
+                  }]);
+                },
+            colors: [remainBlueShade , leaveRedShade, 'black'],
+            customBars: true,
+            interactionModel: {},
+            labelsSeparateLines: true,
+            stepPlot : false,
+            xlabel: 'Votes for Brexit',
+            ylabel: 'Probability',
+            valueRange: [0,25],
+            dateWindow: [0.01, 100.01],
+            xAxisHeight: 25,
+            zoomCallback: function() {g.updateOptions({zoomRange: [0, 25]});},
+            axes: {
+              x: {
+                xAxisLabelWidth: 90,
+                drawGrid: false,
+                valueFormatter: function(x) {
+                  return 'Votes for Brexit = ' + x +'%';
+                },
+                axisLabelFormatter: function(x) {
+                  return x + '%';
+                },
+                //pixelsPerLabel: 50,
+              },
+              y: {
+                drawGrid: false,
+                valueFormatter: function(val, opts, series_name, g_legend) {
+                  if (series_name=='Average'){ return '';}
+                  else {return ' <br/>Probability of this % of votes = '+Math.round(val*10)/10+'%';}
+                },
+                axisLabelFormatter: function(y) {
+                  return y + '%';
+                },
+              },
+            },
+            //vertical bar at 50%
+            underlayCallback: function(canvas, area, g) {
+              var bottom_left = g.toDomCoords(49.9, 0);
+              var top_right = g.toDomCoords(50.1, 100);
+
+              var left = bottom_left[0];
+              var right = top_right[0];
+
+              canvas.fillStyle = "rgba(25, 25, 102, 0.2)";
+              //canvas.fillRect(left, area.y, right - left, area.h);
+
+            },
+            // mark average
+            series : {
+                  'Average': {
+                    strokeWidth: 0.0,
+                    drawPoints: true,
+                    pointSize: 4,
+                    highlightCircleSize: 6
+                  }
+            },
+          }
+        );
+
+
+      g2 = new Dygraph(
+          document.getElementById("div2"),
+          attrs.pathToData + "brexit-timeline.csv", {
+            drawCallback: function(g, is_initial) {
+                if (!is_initial) {return;};
+                g.setVisibility(0, false);
+                g.setVisibility(1, false);
+                // pronadji poziciju zadnje tocke
+                var pozicija=g.layout_.points[0][g.rawData_.length-1].xval+14*60*60*1000;
+                var datum = new Date(pozicija).toISOString().slice(0,10);
+                var value2 = g.layout_.points[0][g.rawData_.length-1].yval
+                if (value2<50.0) {boja=remainBlueShade;}
+                else {boja=leaveRedShade;}
+                g.setAnnotations([
+                {
+                    series: 'Predicted % of votes for Brexit',
+                    x: datum,
+                    shortText: value2 + '% votes for Brexit',
+                    width: 230,
+                    height: 40,
+                    color: boja,
+                    text: '',
+                    tickHeight: 0
+                  }]);
+            },
+            colors: [remainBlueShade , leaveRedShade, 'black'],
+            customBars: true,
+            drawPoints: true,
+            interactionModel: {},
+            stepPlot : false,
+            xlabel: '',
+            ylabel: '',
+            //labelsSeparateLines: true,
+            valueRange: [20,80],
+            dateWindow: [Date.parse("2016/06/12 12:00:00"), Date.parse("2016/06/24 12:00:00")],
+            xAxisHeight: 25,
+            yRangePad: 20,
+            legend: 'always',
+            labelsDivStyles: { 'textAlign': 'left' },
+            axes: {
+              x: {
+                valueFormatter: function(x) {
+                  return 'Date:' + new Date(x+14*60*60*1000).toISOString().slice(0,10)+'&nbsp;&nbsp;&nbsp;';
+                },
+                axisLabelFormatter: function(x) {
+                  if (x.getDate()%2==0 && x.getDate()<23) {
+                  return  Dygraph.zeropad(x.getDate()) + ' ' + m_names[x.getMonth()] + ' \'16';
+                  } else { return '';}
+                },
+                pixelsPerLabel: 50,
+                drawGrid: true,
+                gridLineColor : "rgb(200,200,200)",
+              },
+              y: {
+                valueFormatter: function(val, opts, series_name, g_legend) {
+                  return '= ' + Math.round(val*10)/10+'%'+'&nbsp;&nbsp;&nbsp;';
+                },
+                axisLabelFormatter: function(y) {
+                  return y + '%';
+                },
+                pixelsPerLabel: 20,
+                drawGrid: true,
+                gridLineColor : "rgb(200,200,200)",
+              },
+
+            },
+          }
+        );
+
+      g3 = new Dygraph(
+          document.getElementById("div3"),
+          attrs.pathToData + "brexit-timeline.csv", {
+            drawCallback: function(g, is_initial) {
+                if (!is_initial) {return;};
+                g.setVisibility(2, false);
+                // pronadji poziciju zadnje tocke
+                var pozicija=g.layout_.points[0][g.rawData_.length-1].xval+14*60*60*1000;
+                var datum = new Date(pozicija).toISOString().slice(0,10);
+                var value0 = g.layout_.points[0][g.rawData_.length-1].yval
+                var value1 = g.layout_.points[1][g.rawData_.length-1].yval
+                g.setAnnotations([
+                  {
+                    series: 'Probability of REMAIN',
+                    x: datum,
+                    shortText: value0 + '% probability of REMAIN',
+                    width: 330,
+                    height: 20,
+                    color: remainBlueShade,
+                    text: '',
+                    tickHeight: 0
+                  },
+                  {
+                    series: 'Probability of LEAVE',
+                    x: datum,
+                    shortText: value1 + '% probability of LEAVE',
+                    width: 300,
+                    height: 20,
+                    color: leaveRedShade,
+                    text: '',
+                    tickHeight: 0
+                  }]);
+            },
+            colors: [remainBlueShade , leaveRedShade, 'black'],
+            customBars: true,
+            drawPoints: true,
+            interactionModel: {},
+            stepPlot : false,
+            xlabel: '',
+            ylabel: '',
+            //labelsSeparateLines: true,
+            valueRange: [20,80],
+            dateWindow: [Date.parse("2016/06/12 12:00:00"), Date.parse("2016/06/24 12:00:00")],
+            xAxisHeight: 25,
+            yRangePad: 20,
+            legend: 'always',
+            labelsDivStyles: { 'textAlign': 'left' },
+            axes: {
+              x: {
+                valueFormatter: function(x) {
+                  return 'Date:' + new Date(x+14*60*60*1000).toISOString().slice(0,10)+'&nbsp;&nbsp;&nbsp;';
+                },
+                axisLabelFormatter: function(x) {
+                  if (x.getDate()%2==0 && x.getDate()<23) {
+                  return  Dygraph.zeropad(x.getDate()) + ' ' + m_names[x.getMonth()] + ' \'16';
+                  } else { return '';}
+                },
+                pixelsPerLabel: 50,
+                drawGrid: true,
+                gridLineColor : "rgb(200,200,200)",
+              },
+              y: {
+                valueFormatter: function(val, opts, series_name, g_legend) {
+                  return '= ' + Math.round(val*10)/10+'%'+'&nbsp;&nbsp;&nbsp;';
+                },
+                axisLabelFormatter: function(y) {
+                  return y + '%';
+                },
+                pixelsPerLabel: 20,
+                drawGrid: true,
+                gridLineColor : "rgb(200,200,200)",
+              },
+
+            },
+          }
+        );
 
     }};
 

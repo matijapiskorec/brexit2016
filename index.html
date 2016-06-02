@@ -20,7 +20,7 @@
   <meta id="mediaSlideKeywords" name="keywords" content="sabor, 2015, izbori"></meta>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- <title>{% block title %}referendum2013.hr{% endblock %}</title> -->
-  <title>brexit2016</title>
+  <title>brexit.oraclum.co.uk</title>
 
   <link rel="shortcut icon" href="static/images/sabor2015-favicon.ico" />
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
@@ -33,6 +33,8 @@
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   <!-- // <script src="{{ STATIC_URL }}js/csrf.js"></script> -->
+
+  <script type="text/javascript" src="static/js/dygraph-Brexit.js"></script>
 
   <script type="text/javascript">
     // var current_vote = {{ vote }};
@@ -67,7 +69,7 @@
           <span class="icon-bar"></span> 
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/" >brexit2016</a>
+        <a class="navbar-brand" href="/" >brexit.oraclum.co.uk</a>
       </div>
       <nav class="navbar-collapse bs-navbar-collapse collapse navbar-right" role="navigation" style="height: 1px;">
 <!--         {% if user.is_authenticated %}
@@ -89,7 +91,7 @@
     <div class="row">
       <div class="col-sm-4">
         <div class="row text-center">
-          <img src="static/images/brexit-logo.png" alt="brexit.oraclum.co.uk" class="header-logo" />
+          <img src="static/images/brexit-logo-v2.png" alt="brexit.oraclum.co.uk" class="header-logo" />
           <!-- <progress-chart></progress-chart> -->
         </div>
       </div>
@@ -149,12 +151,19 @@
     </div>
   </div>
 
+  <hr/>
 
-<div class="container">
-
-</div>
+  <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+            <h2>Predictions</h2>
+            <predictions path-to-data="static/data/"></predictions>
+        </div>
+      </div>
+  </div>
 
   <hr />
+
   <div class="container">
     <div class="row">
       <div class="col-md-6">
@@ -186,7 +195,7 @@
     <hr />
 
     <footer>
-      <p>brexit2016</p>
+      <p>brexit.oraclum.co.uk</p>
     </footer>
 
     <!-- <input type="hidden" id="global_results" value="{{ global_results }}"> -->

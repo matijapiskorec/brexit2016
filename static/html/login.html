@@ -19,6 +19,7 @@
 
 <meta id="mediaSlideKeywords" name="keywords" content="sabor, 2015, izbori"></meta>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>brexit.oraclum.co.uk</title>
 
 <link rel="shortcut icon" href="../images/brexit.ico" />
@@ -45,9 +46,10 @@
 <script src="../bootstrap-multiselect/bootstrap-multiselect.js"></script>
 <link rel="stylesheet" href="../bootstrap-multiselect/bootstrap-multiselect.css" type="text/css" media="all" />
 
-<script src="../js/fuse.min.js"></script>
 <script src="../js/typeahead.bundle.js"></script>
 <link rel="stylesheet" href="../css/typeahead.css" type="text/css" media="all" />
+
+<script type="text/javascript" src="../js/dygraph-Brexit.js"></script>
 
 <script>
 // TODO: I EXPECT THIS TO BE INJECTED BY THE SERVER PLEASE!
@@ -95,12 +97,6 @@ document.cookie = "csrf_token=SuperSecretToken123";
         <age-group></age-group>
       </div>
 
-<!--       <div class="col-md-6">
-        <h3>Your region (postcodes)</h3>
-        <p>Postal codes are validated through <a href="https://postcodes.io/">postcodes.io</a></p>
-        <find-region2 url="../data/postcode-region-lookup.json"></find-region2>
-      </div> -->
-
       <div class="row">
         <div class="col-md-6">
           <h3>Your region</h3>
@@ -120,14 +116,12 @@ document.cookie = "csrf_token=SuperSecretToken123";
 
     <div class="row">
       <div class="col-md-12">
-        <!-- <h3>Approximate the precentage of votes that your option will gain in your region ON THE ACTUAL REFERENDUM.</h3> -->
         <question-meta1></question-meta1>
       </div>
     </div>
     
     <div class="row">
       <div class="col-md-12">
-<!--         <h3>Approximate the precentage of votes that your option will gain in your region ON THIS POLL.</h3> -->
         <question-meta2></question-meta2>
       </div>
     </div>
@@ -175,17 +169,28 @@ document.cookie = "csrf_token=SuperSecretToken123";
 
           <map-statistics></map-statistics>
 
-        </div>
+          <!-- NOTE: For some reason predictions are not rendered properly when inside results element! -->
+          <!-- <h2>Predictions</h2> -->
+          <!-- <predictions></predictions> -->
+
+      </div>
 
     </results>
+
+    <!-- Mockup buttons for loading user data -->
+    <load-user-data></load-user-data>
  
+    <hr/>
+    <div class="row">
+      <div class="col-md-12">
+          <h2>Predictions</h2>
+          <predictions path-to-data="../data/"></predictions>
+      </div>
+    </div>
+  
   </div>
 
-  <!-- Mockup buttons for loading user data -->
-  <load-user-data></load-user-data>
-
 </div>
-
 
   <hr/>
   <div class="container">
@@ -193,7 +198,8 @@ document.cookie = "csrf_token=SuperSecretToken123";
      <p>@brexit.oraclum.co.uk</p>
   </footer>
   </div>  
-  
+
+
   <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script> -->
 
