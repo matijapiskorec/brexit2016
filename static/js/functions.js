@@ -418,7 +418,7 @@ brexit.directive('questionMeta1', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>Approximate the precentage of votes that <span id="vote-label-meta1">your option</span> will gain in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
+        '<h3>Estimate the precentage of votes that <span id="vote-label-meta1">your option</span> will gain in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta1" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -495,7 +495,7 @@ brexit.directive('questionMeta2', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>Approximate the precentage of votes that <span id="vote-label-meta2">your option</span> will gain in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
+        '<h3>Estimate the precentage of votes that <span id="vote-label-meta2">your option</span> will gain in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta2" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -633,31 +633,11 @@ brexit.directive('buttonVote', function ($parse) {
 
         scope.sendAnswers("api/send_answers",d);
 
+        // NOTE: On production this goes into sendAnswers() success callback!
         $('#results').show(1000);
-
         scope.getVotes("../data/votes_users.json");
-        // scope.getTotalVotes("../data/total_votes.json");
-        // scope.getFriendsVotes("../data/friends_votes.json");
-
         scope.getVotesInTime("../data/votes_in_time.json");
         scope.getVotesRegions("../data/votes_regions.json");
-
-        // // TODO: Here goes ajax call!
-        // var data = 'vote=' + vote_value;
-        // $.ajax({
-        //   url: "/vote/",
-        //   type: "POST",
-        //   data: data,
-        //   cache: true,
-        //   success: function (data, textStatus, jqXHR) {
-        //     current_vote = data;
-        //     change_btn_vote_style(current_vote);
-        //     change_vote_msg(current_vote);
-        //     draw_results();
-        //   },
-        //   complete: function (jqXHR, textStatus) {},
-        //   error: function (jqXHR, textStatus, errorThrown) {}
-        // });
 
       }
 
@@ -671,24 +651,51 @@ brexit.directive('results', function ($parse) {
     replace: false,
     link: function (scope, element, attrs) {
 
-     scope.$watch('friends_data', function (newData, oldData) {
+     scope.$watch('friends_votes', function (newData, oldData) {
 
         if (!newData) { return; }
-        var friends_data = newData;
+        // var friends_data = newData;
 
         $(element).show(1000);
-
-        $('#total-votes-friends').text(
-          friends_data.map(function(d){return d.votes})
-                      .reduce(function(prev,curr){return curr + prev;},0)
-        );
 
         if ($('.rank').text()=="") {
           $('#span-reach').remove();
         }
 
-        // TODO: DATA ON TOTAL VOTES SHOULD BE LOADED IN CONTROLER AND APPROPRIATE WATCH PUT SOMEWHERE HERE! 
-        $('#total-votes').text("555");
+        // If you have no friends we have to change the text
+        if (Number($('.votes-friends').text())==0) {
+          $('#friend-count-label').text('None of your friends yet voted on this application:-(');
+        }
+        
+        // If no users came through your share we have to change the text
+        if (Number($('.shares-friends').text())==0) {
+          $('#reach-count-label').text('No users came to this application through one of your shares:-(');
+        }
+
+        // Format rank numbers
+        var formatRankNumber = function(d) {
+          var lastDigit = d.slice(-1);
+          if (lastDigit=="1") {
+            return d+"<sup>st</sup>";
+          } else if (lastDigit=="2") {
+            return d+"<sup>nd</sup>";
+          } else {
+            return d+"<sup>th</sup>";
+          }
+        };
+
+        $('.rank-friends').html( formatRankNumber($('.rank-friends').text()) );
+        $('.rank-shares').html( formatRankNumber($('.rank-shares').text()) );
+
+        if ($('.rank-friends').text()=='N/A.') {
+          $('#friend-rank-label').empty();
+        }
+        
+        if ($('.rank-shares').text()=='N/A.') {
+          $('#reach-rank-label').empty();
+        }
+
+
 
       });
 

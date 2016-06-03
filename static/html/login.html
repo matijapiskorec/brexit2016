@@ -80,7 +80,7 @@ document.cookie = "csrf_token=SuperSecretToken123";
 
   <div class="container">   
     <div class="row text-center">
-      <img src="../images/brexit-logo-v2.png" alt="brexit.oraclum.co.uk" class="header-logo" />
+      <img src="../images/brexit-logo-v3.png" alt="brexit.oraclum.co.uk" class="header-logo" />
     </div>
   </div>
 
@@ -136,25 +136,27 @@ document.cookie = "csrf_token=SuperSecretToken123";
         <div class="col-md-6">
 
           <h2>Total results</h2>
+
+          <percentage-total></percentage-total>
+
           <p>Total of <span class="badge votes-all">2345</span> users voted.</p>
           <!-- <p><span id="total-votes" class="badge"></span> users voted.</p> -->
           <a class="btn btn-default" href="" target="_blank" onClick="return fbs_click(400, 300)"><i class="fa fa-facebook">  Share on Facebook</i></a>
 
-          <percentage-total></percentage-total>
 
         </div>
         <div class="col-md-6">
 
           <h2>Results for your friends</h2>
 
-          <p id="friend-count-label">Total of <span class="badge votes-friends">123</span> of your friends had voted. <span id="friend-rank-label">This puts you on the <span class="badge rank-friends">12.</span> place by the number of friends.</span></p> 
+          <percentage-friends></percentage-friends>
 
-          <p id="reach-count-label">Total of <span class="badge shares-friends">123</span> users came to this application through your share. <span id="reach-rank-label">This puts you on the <span class="badge rank-shares">12.</span> place by the influence on other users.</span></p>
+          <p id="friend-count-label">Total of <span class="badge votes-friends">22</span> of your friends had voted. <span id="friend-rank-label">This puts you on the <span class="badge rank-friends">101</span> place by the number of friends.</span></p> 
 
-          <!-- <p><span id="total-votes-friends" class="badge"></span> of your friends had voted. <span id="span-reach">This places you in the <span class="badge rank">1</span> place by influence.</span></p> -->
+          <p id="reach-count-label">Total of <span class="badge shares-friends">22</span> users came to this application through your share. <span id="reach-rank-label">This puts you on the <span class="badge rank-shares">125</span> place by the influence on other users.</span></p>
+
           <a class="btn btn-default" href="" target="_blank" onClick="return fbs_click(400, 300)"><i class="fa fa-facebook">  Share on Facebook</i></a>
 
-          <percentage-friends></percentage-friends>
 
         </div>
       </div>
