@@ -54,6 +54,7 @@
 <script>
 // TODO: I EXPECT THIS TO BE INJECTED BY THE SERVER PLEASE!
 document.cookie = "csrf_token=SuperSecretToken123";
+var user_id = "SuperSecretUserID";
 </script>
 
 <script>(function(d, s, id) {
@@ -131,6 +132,17 @@ document.cookie = "csrf_token=SuperSecretToken123";
     <hr/>
 
     <results id="results" style="display:none;">
+
+      <div class="row">
+        <div class="col-md-12">
+
+          <h2>Extra questions</h2>
+          <question-extra></question-extra>
+
+        </div>
+      </div>
+
+      <hr/>
 
       <div class="row">
         <div class="col-md-6">

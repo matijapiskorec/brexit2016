@@ -35,6 +35,22 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
         'L': 'leave'
     };
 
+    $scope.codeToEducation = {
+        0: 'Primary education',
+        1: 'Secondary education',
+        2: 'University - bachelors degree',
+        3: 'University - masters degree',
+        4: 'University - doctoral degree'
+    };
+
+    $scope.codeToParty = {
+        0: 'Conservative and Unionist Party',
+        1: 'Labour party',
+        2: 'Scottish National Party',
+        3: 'Liberal democrats',
+        4: 'UK Independance Party'
+    };
+
     $scope.setRegion = function(d) {
       $scope.user_info.region = d;
       $scope.$apply();
@@ -67,6 +83,16 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
 
     $scope.setMeta2 = function(meta2) {
       $scope.user_info.meta2 = meta2;
+      $scope.$apply();
+    };
+
+    $scope.setEducation = function(education) {
+      $scope.user_info.education = education;
+      $scope.$apply();
+    };
+
+    $scope.setParty = function(party) {
+      $scope.user_info.party = party;
       $scope.$apply();
     };
 
@@ -104,6 +130,25 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
             // TODO: Because this endpoint is not working we return csrf token here for testing.
             //       (Otherwise it goes in success callback.)
             document.cookie = "csrf_token=NewVersionOfTheSuperSecretToken123";
+          } else {
+            $scope.error = 'Error: ' + status;
+          }
+        });
+    };
+
+    // Send answers to extra questions back to server
+    $scope.sendAnswersExtra = function(url,data) {
+      $http({url: url, 
+             data: data, 
+             xsrfHeaderName: "X-CSRF-Token",
+             xsrfCookieName: "csrf_token",
+             method: 'POST'})
+        .success(function (data, status, headers, config) {
+          document.cookie = "csrf_token=" + data.token; // Update token
+        })
+        .error(function (data, status) {
+          if (status === 404) {
+            $scope.error = 'Database not available!';
           } else {
             $scope.error = 'Error: ' + status;
           }
@@ -1041,6 +1086,108 @@ brexit.directive('percentageFriends', function ($parse) {
 
 }); 
 
+
+brexit.directive('questionExtra', function ($parse) {
+  return {
+    restrict: 'E',
+    replace: false,
+    link: function (scope, element, attrs) {
+
+      // size="2" is a workaround so that first option is not automatically selected
+      // https://github.com/davidstutz/bootstrap-multiselect/issues/129
+      $(element).html(
+        '<h3>Your education</h3>'+
+        '<select id="question-education" size="2">'+
+          '<option value="0">Primary education</option>'+
+          '<option value="1">Secondary education</option>'+
+          '<option value="2">University - bachelor\'s degree</option>'+
+          '<option value="3">University - master\'s degree</option>'+
+          '<option value="4">University - doctoral degree</option>'+
+        '</select>'+
+        '<div style="height:5px;clear:both;"></div>' +
+        '<h3>For whom did you vote on the past UK parliamentary elections?</h3>'+
+        '<select id="question-party" size="2">'+
+          '<option value="0">Conservative and Unionist Party</option>'+
+          '<option value="1">Labour party</option>'+
+          '<option value="2">Scottish National Party</option>'+
+          '<option value="3">Liberal democrats</option>'+
+          '<option value="4">UK Independance Party</option>'+
+        '</select>'+
+        '<div style="height:5px;clear:both;"></div>' +
+        '<p id="vote-extra-label"></p>' +
+        '<div style="height:5px;clear:both;"></div>' +
+        '<button id="button-vote-extra" class="btn btn-lg btn-default">Submit extra answers</button>'+
+        '<div style="height:5px;clear:both;"></div>'
+      );
+
+      $("#question-education").multiselect({
+        nonSelectedText: 'Choose your education...',
+        onChange: function(option, checked, select) {
+          scope.setEducation($(option).val());
+          }
+      });
+
+      $("#question-party").multiselect({
+        nonSelectedText: 'Choose your party...',
+        onChange: function(option, checked, select) {
+          scope.setParty($(option).val());
+          }
+      });
+
+      scope.$watch('initial_user_info.education', function (newData, oldData) {
+        if (!newData) { return; }
+        $("#question-education").multiselect('select', newData);
+        console.log('Initial education is set to ' + scope.codeToEducation[newData]);
+      });
+
+      scope.$watch('user_info.education', function (newData, oldData) {
+        if (!newData) { return; }
+        console.log('User choose education ' + scope.codeToEducation[newData]);
+      });
+
+      scope.$watch('initial_user_info.party', function (newData, oldData) {
+        if (!newData) { return; }
+        $("#question-party").multiselect('select', newData);
+        console.log('Initial party is set to ' + scope.codeToParty[newData]);
+      });
+
+      scope.$watch('user_info.party', function (newData, oldData) {
+        if (!newData) { return; }
+        console.log('User choose party ' + scope.codeToParty[newData]);
+      });
+
+      $("#button-vote-extra").click(function (e) {
+
+        if ( scope.user_info.education || scope.initial_user_info.education || scope.user_info.party || scope.initial_user_info.party ) {
+
+          // All values which are not set by the user in this session should be taken from initialization
+          var education = scope.user_info.education ? scope.user_info.education : scope.initial_user_info.education;
+          var party = scope.user_info.party ? scope.user_info.party : scope.initial_user_info.party;
+
+          var extra_answers = {};
+          extra_answers.user_id = user_id; // This is supposed to be injected into main login template.
+
+          if ( !(typeof education === "undefined") ) {
+            extra_answers.education = education;
+          }
+          if ( !(typeof party === "undefined") ) {
+            extra_answers.party = party;
+          }
+
+          // Send answers to extra questiona back to the server
+          scope.sendAnswersExtra("api/answer/extra",extra_answers);
+
+          $('#vote-extra-label').html('Your answers are submitted!');
+
+        } else {
+          $('#vote-extra-label').html('<span style="color:red">Please fill in at least one answer before submitting!</span>');
+        }
+
+      });
+
+    }};
+
+}); 
 
 
 brexit.directive('votesInTime', function ($parse) {
