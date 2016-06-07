@@ -44,11 +44,13 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
     };
 
     $scope.codeToParty = {
-        0: 'Conservative and Unionist Party',
-        1: 'Labour party',
+        0: 'Conservative Party',
+        1: 'Labour Party',
         2: 'Scottish National Party',
-        3: 'Liberal democrats',
-        4: 'UK Independance Party'
+        3: 'Liberal Democrats',
+        4: 'UK Independance Party',
+        5: 'Other',
+        6: 'I did not vote'
     };
 
     $scope.setRegion = function(d) {
@@ -463,7 +465,7 @@ brexit.directive('questionMeta1', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>Estimate the precentage of votes that <span id="vote-label-meta1">your option</span> will gain in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
+        '<h3>Estimate the precentage of votes that <span id="vote-label-meta1">your option</span> will get in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta1" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -484,7 +486,7 @@ brexit.directive('questionMeta1', function ($parse) {
       });
       
       $("#question-meta1").on('change', function(e) {
-        $('#meta-label1').text('You had chosen ' + e.value.newValue + '%.');
+        $('#meta-label1').text('You have chosen ' + e.value.newValue + '%.');
       });
 
       // // Set initial value to zero (this is also valid and can be submitted!)
@@ -523,7 +525,7 @@ brexit.directive('questionMeta1', function ($parse) {
         if (!newData) { return; }
 
         $("#question-meta1").slider('setValue',newData);
-        $('#meta-label1').text('You had chosen ' + newData + '%.');
+        $('#meta-label1').text('You have chosen ' + newData + '%.');
 
         console.log('Initial value of meta question 1 is ' + newData);
       });
@@ -540,7 +542,7 @@ brexit.directive('questionMeta2', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>Estimate the precentage of votes that <span id="vote-label-meta2">your option</span> will gain in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
+        '<h3>Estimate the precentage of votes that <span id="vote-label-meta2">your option</span> will get in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta2" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -561,7 +563,7 @@ brexit.directive('questionMeta2', function ($parse) {
       });
       
       $("#question-meta2").on('change', function(e) {
-        $('#meta-label2').text('You had chosen ' + e.value.newValue + '%.');
+        $('#meta-label2').text('You have chosen ' + e.value.newValue + '%.');
       });
 
       // // Set initial value to zero (this is also valid and can be submitted!)
@@ -600,7 +602,7 @@ brexit.directive('questionMeta2', function ($parse) {
         if (!newData) { return; }
 
         $("#question-meta2").slider('setValue',newData);
-        $('#meta-label2').text('You had chosen ' + newData + '%.');
+        $('#meta-label2').text('You have chosen ' + newData + '%.');
 
         console.log('Initial value of meta question 2 is ' + newData);
       });
@@ -1105,13 +1107,15 @@ brexit.directive('questionExtra', function ($parse) {
           '<option value="4">University - doctoral degree</option>'+
         '</select>'+
         '<div style="height:5px;clear:both;"></div>' +
-        '<h3>For whom did you vote on the past UK parliamentary elections?</h3>'+
+        '<h3>Who did you vote for at the 2015 UK general election?</h3>'+
         '<select id="question-party" size="2">'+
-          '<option value="0">Conservative and Unionist Party</option>'+
-          '<option value="1">Labour party</option>'+
+          '<option value="0">Conservative Party</option>'+
+          '<option value="1">Labour Party</option>'+
           '<option value="2">Scottish National Party</option>'+
-          '<option value="3">Liberal democrats</option>'+
+          '<option value="3">Liberal Democrats</option>'+
           '<option value="4">UK Independance Party</option>'+
+          '<option value="5">Other</option>'+
+          '<option value="6">I did not vote</option>'+
         '</select>'+
         '<div style="height:5px;clear:both;"></div>' +
         '<p id="vote-extra-label"></p>' +
