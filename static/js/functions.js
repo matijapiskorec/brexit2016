@@ -514,7 +514,7 @@ brexit.directive('questionMeta1', function ($parse) {
 
         var region = newData[0] || newData[1];
 
-        console.log('#region-label-meta1 = ' + scope.codeToRegion[region.region]);
+        // console.log('#region-label-meta1 = ' + scope.codeToRegion[region.region]);
 
         $('#region-label-meta1').html(scope.codeToRegion[region.region]);
 
@@ -591,7 +591,7 @@ brexit.directive('questionMeta2', function ($parse) {
 
         var region = newData[0] || newData[1];
 
-        console.log('#region-label-meta2 = ' + scope.codeToRegion[region.region]);
+        // console.log('#region-label-meta2 = ' + scope.codeToRegion[region.region]);
 
         $('#region-label-meta2').html(scope.codeToRegion[region.region]);
 
@@ -657,12 +657,15 @@ brexit.directive('buttonVote', function ($parse) {
                            (vote=='R' ? '#4575b4' : '#f11b1b') +
                            '">' + scope.codeToVote[vote].toUpperCase() + '</span>'
 
-          $('#current-vote-label').html('You vote to ' + voteParsed + ' (constituency "' + region.constituency + '", region "' + scope.codeToRegion[region.region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
+          var constituency = _.pluck(_.where(scope.constituency_region,{'code':region.code}), 'constituency');
+
+          $('#current-vote-label').html('You vote to ' + voteParsed + ' (constituency "' + constituency + '", region "' + scope.codeToRegion[region.region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
+          // $('#current-vote-label').html('You vote to ' + voteParsed + ' (constituency "' + region.constituency + '", region "' + scope.codeToRegion[region.region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
           // $('#current-vote-label').html('You vote to ' + voteParsed + ' (postcode ' + postcode + ', region "' + scope.codeToRegion[region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
         
           user_vote({'vote': vote, 
                      'age_group': age_group,
-                     'region': region, // 'postcode': postcode,
+                     'region': {'code':region.code,'region':region.region}, // 'postcode': postcode,
                      'meta1': meta1,
                      'meta2': meta2
                     });
@@ -675,7 +678,9 @@ brexit.directive('buttonVote', function ($parse) {
 
       var user_vote = function (d) {
 
-        console.log('You vote to ' + scope.codeToVote[d.vote] + ' (constituency "' + d.region.constituency + '", region "' + scope.codeToRegion[d.region.region] + '"), age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
+        var constituency = _.pluck(_.where(scope.constituency_region,{'code':d.region.code}), 'constituency');
+        console.log('You vote to ' + scope.codeToVote[d.vote] + ' (constituency "' + constituency + '", region "' + scope.codeToRegion[d.region.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
+        // console.log('You vote to ' + scope.codeToVote[d.vote] + ' (constituency "' + d.region.constituency + '", region "' + scope.codeToRegion[d.region.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
         // console.log('You vote to ' + scope.codeToVote[d.vote] + ' (postcode ' + d.postcode + ', region "' + scope.codeToRegion[d.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
 
         scope.sendAnswers("api/send_answers",d);
@@ -742,8 +747,6 @@ brexit.directive('results', function ($parse) {
           $('#reach-rank-label').empty();
         }
 
-
-
       });
 
     }};
@@ -760,7 +763,6 @@ brexit.directive('percentageTotal', function ($parse) {
       $(element).html(
         '<div id="percentage-total"></div>'
       );
-
 
      scope.$watch('total_votes', function (newData, oldData) {
 
@@ -1360,13 +1362,33 @@ brexit.directive('findRegion', function ($parse) {
 
       });
 
-      scope.$watch('initial_user_info.region', function (newData, oldData) {
+      // scope.$watch('initial_user_info.region', function (newData, oldData) {
 
-        if (!newData) { return; }
+      //   if (!newData) { return; }
 
-        $('#region-input').data(newData);
-        $('#region-input').val(newData.constituency + ' (region ' + scope.codeToRegion[newData.region] + ')');
+      //   $('#region-input').data(newData);
+      //   $('#region-input').val(newData.constituency + ' (region ' + scope.codeToRegion[newData.region] + ')');
         
+      // });
+
+      scope.$watchGroup(['constituency_region','initial_user_info.region'], function (newData, oldData) {
+
+        if (!newData[0] || !newData[1]) { return; }
+
+        // var constituency_region = newData[0];
+        var region = {};
+
+        region.code = newData[1].code;
+        region.constituency = _.pluck(_.where(newData[0],{'code':newData[1].code}), 'constituency');;
+        region.region = newData[1].region;
+
+        // _.pluck(_.where(newData[0],{'code':newData[1].code}), 'constituency');
+
+        // $('#region-input').data(newData);
+        // $('#region-input').val(newData.constituency + ' (region ' + scope.codeToRegion[newData.region] + ')');
+        
+        $('#region-input').data(region);
+        $('#region-input').val(region.constituency + ' (region ' + scope.codeToRegion[region.region] + ')');
       });
 
     }};
