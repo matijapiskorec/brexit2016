@@ -328,10 +328,8 @@ brexit.directive('ageGroup', function ($parse) {
     replace: false,
     link: function (scope, element, attrs) {
 
-      // size="2" is a workaround so that first option is not automatically selected
-      // https://github.com/davidstutz/bootstrap-multiselect/issues/129
       $(element).html(
-        '<select id="question-age-group" size="2">'+
+        '<select id="question-age-group" class="selectpicker">'+
           '<option value="0">18-29 years</option>'+
           '<option value="1">30-39 years</option>'+
           '<option value="2">40-49 years</option>'+
@@ -340,18 +338,17 @@ brexit.directive('ageGroup', function ($parse) {
         '</select>'
       );
 
-      $("#question-age-group").multiselect({
-        nonSelectedText: 'Choose your age group...',
-        onChange: function(option, checked, select) {
-          scope.setAgeGroup($(option).val());
-          }
+      $('#question-age-group').selectpicker({
+        title: 'Choose your age group...'
+      });
+
+      $('#question-age-group').on('change', function(){
+        scope.setAgeGroup($(this).find("option:selected").val());
       });
 
       scope.$watch('initial_user_info.age_group', function (newData, oldData) {
-
         if (!newData) { return; }
-        $("#question-age-group").multiselect('select', newData);
-
+        $("#question-age-group").selectpicker('val', newData);
         console.log('Initial age group is set to ' + newData);
       });
 
@@ -1101,11 +1098,9 @@ brexit.directive('questionExtra', function ($parse) {
     replace: false,
     link: function (scope, element, attrs) {
 
-      // size="2" is a workaround so that first option is not automatically selected
-      // https://github.com/davidstutz/bootstrap-multiselect/issues/129
       $(element).html(
         '<h3>Your education</h3>'+
-        '<select id="question-education" size="2">'+
+        '<select id="question-education" class="selectpicker">'+
           '<option value="0">Primary education</option>'+
           '<option value="1">Secondary education</option>'+
           '<option value="2">University - bachelor\'s degree</option>'+
@@ -1114,7 +1109,7 @@ brexit.directive('questionExtra', function ($parse) {
         '</select>'+
         '<div style="height:5px;clear:both;"></div>' +
         '<h3>Who did you vote for at the 2015 UK general election?</h3>'+
-        '<select id="question-party" size="2">'+
+        '<select id="question-party" class="selectpicker">'+
           '<option value="0">Conservative Party</option>'+
           '<option value="1">Labour Party</option>'+
           '<option value="2">Scottish National Party</option>'+
@@ -1130,23 +1125,26 @@ brexit.directive('questionExtra', function ($parse) {
         '<div style="height:5px;clear:both;"></div>'
       );
 
-      $("#question-education").multiselect({
-        nonSelectedText: 'Choose your education...',
-        onChange: function(option, checked, select) {
-          scope.setEducation($(option).val());
-          }
+      $('#question-education').selectpicker({
+        title: 'Choose your education...'
       });
 
-      $("#question-party").multiselect({
-        nonSelectedText: 'Choose your party...',
-        onChange: function(option, checked, select) {
-          scope.setParty($(option).val());
-          }
+      $('#question-education').on('change', function(){
+        scope.setEducation($(this).find("option:selected").val());
       });
+
+      $('#question-party').selectpicker({
+        title: 'Choose your party...'
+      });
+
+      $('#question-party').on('change', function(){
+        scope.setParty($(this).find("option:selected").val());
+      });
+
 
       scope.$watch('initial_user_info.education', function (newData, oldData) {
         if (!newData) { return; }
-        $("#question-education").multiselect('select', newData);
+        $("#question-education").selectpicker('val', newData);
         console.log('Initial education is set to ' + scope.codeToEducation[newData]);
       });
 
@@ -1157,7 +1155,7 @@ brexit.directive('questionExtra', function ($parse) {
 
       scope.$watch('initial_user_info.party', function (newData, oldData) {
         if (!newData) { return; }
-        $("#question-party").multiselect('select', newData);
+        $("#question-party").selectpicker('val', newData);
         console.log('Initial party is set to ' + scope.codeToParty[newData]);
       });
 
