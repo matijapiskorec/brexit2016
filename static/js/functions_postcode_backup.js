@@ -58,6 +58,16 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       $scope.$apply();
     };
 
+    $scope.setPostcode = function(d) {
+      $scope.user_info.postcode = d;
+      $scope.$apply();
+    };
+
+    $scope.setPostcodeCheck = function(d) {
+      $scope.postcode_check = d;
+      $scope.$apply();
+    };
+
     $scope.setAgeGroup = function(age_group) {
       $scope.user_info.age_group = age_group;
       $scope.$apply();
@@ -120,6 +130,7 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
 
           // Because voting ended successfully we can retrieve all available statistics through individual api calls
           $('#results').show(1000);
+
           $scope.getFriendsData("api/friends/votes");
           $scope.getGlobalStatistics("api/global/votes");
           $scope.getRegionStatistics("api/regions/votes"); // We also have api/region/votes for votes in my region, but this is not neccessary anymore
@@ -129,17 +140,9 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
         .error(function (data, status) {
           if (status === 405) { // Or 404!
             $scope.error = 'Database not available!';
-
             // TODO: Because this endpoint is not working we return csrf token here for testing.
             //       (Otherwise it goes in success callback.)
             document.cookie = "csrf_token=NewVersionOfTheSuperSecretToken123";
-
-            // TODO: On production this goes into success callback!
-            $('#results').show(1000);
-            $scope.getVotes("../data/votes_users.json"); // api/friends/votes
-            $scope.getVotesInTime("../data/votes_in_time.json"); // api/votes/in_time
-            $scope.getVotesRegions("../data/votes_regions.json"); // api/regions/votes
-
           } else {
             $scope.error = 'Error: ' + status;
           }
@@ -175,15 +178,15 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
         .success(function (data) {
           $scope.initial_user_info = data;
           $scope.error = ''; // clear the error messages
+          
+          $scope.postcode_check = false; // We probably loaded postcode but we still have to check it.
 
-          // If user voted already (a returning user who voted) show him all the statistics
-          if ( data.vote && (data.meta1 || data.meta1==0 ) && 
-               (data.meta2 || data.meta2==0 ) && !(typeof data.region === "undefined") ) {
+          if (data.returning_user) {
             $('#results').show(1000);
-            
-            $scope.getVotes("../data/votes_users.json"); // api/global/votes // api/friends/votes
-            $scope.getVotesInTime("../data/votes_in_time.json"); // /api/votes/in_time
-            $scope.getVotesRegions("../data/votes_regions.json"); // /api/regions/votes
+            $scope.getVotes("../data/votes_users.json");
+
+            $scope.getVotesInTime("../data/votes_in_time.json");
+            $scope.getVotesRegions("../data/votes_regions.json");
           }
 
         })
@@ -197,7 +200,7 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
     };
 
     // TODO: This is loaded even on the welcome page. Maybe this is not neccessary?
-    // $scope.loadUserData("../data/new_user_info.json");
+    $scope.loadUserData("../data/new_user_info.json");
     // $scope.loadUserData("../data/user_info.json");
 
     // Load all data
@@ -205,21 +208,20 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       $http({url: url, method: 'GET'})
         .success(function (data) {
           $scope.initial_user_info = data.user_info;
-          $scope.constituency_region = data.constituency_region;
+          $scope.parties = data.parties;
+          $scope.election_regions = data.election_regions;
+          $scope.regions = data.regions;
 
           $scope.error = ''; // clear the error messages
 
           // If user voted already then show him all the statistics
-          if ( data.user_info.vote && (data.user_info.meta1 || data.user_info.meta1==0 ) && 
-               (data.user_info.meta2 || data.user_info.meta2==0 ) && 
-               !(typeof data.user_info.region === "undefined") ) {
-
+          if (data.user_info.vote_list && (data.user_info.vote_meta || data.user_info.vote_meta==0 ) && data.user_info.vote_region) {
             $('#results').show(1000);
 
-            $scope.total_votes = data.votes_users.global_votes;
-            $scope.friends_votes = data.votes_users.friends_votes;
-            $scope.votes_in_time = data.votes_in_time;
-            $scope.votes_regions = data.votes_regions;
+            $scope.friends_data = data.friend_votes;
+            $scope.votes_in_time = data.vote_in_time;
+            $scope.global_statistics = data.global_votes;
+            $scope.region_statistics = data.region_votes;
 
           }
 
@@ -283,11 +285,49 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       });
     };
 
+    $scope.getPostalCodes = function(url) {
+      $http({url: url, method: 'GET'})
+        .success(function (data) {
+          $scope.postcodes_region_lookup = data;
+          $scope.error = ''; // clear the error messages
+        })
+        .error(function (data, status) {
+          if (status === 404) {
+            $scope.error = 'Database not available!';
+          } else {
+            $scope.error = 'Error: ' + status;
+          }
+        });
+    };
+
+    $scope.checkPostalCode = function(postcode) {
+      $http({url: 'http://api.postcodes.io/postcodes/' + postcode, method: 'GET'})
+        .success(function (data) {
+          // data.status: 200 (OK), 400 (bad request), 404 (not found), 500 (server error)
+          // data.result: true, false
+          $scope.postcode_check = {'postcode':postcode,'status':data.status};
+          // $scope.postcode_check.postcode = postcode;
+          // $scope.postcode_check.status = data.status;
+          //$scope.$apply();
+          // console.log('Postcode ' + postcode + ' confirmed!');
+          $scope.error = ''; // clear the error messages
+          // console.log($scope.postcode_check);
+        })
+        .error(function (data, status) {
+          $scope.postcode_check = {'postcode':postcode,'status':status};
+          // $scope.postcode_check.postcode = postcode;
+          // $scope.postcode_check.status = status;
+          //$scope.$apply();
+          $scope.error = 'Error: ' + status;
+          // console.log($scope.postcode_check);
+        });
+    };
+
 
 }]);
 
 
-// ONLY FOR TESTING: Buttons for mockup loading of user data
+// Buttons for mockup loading of user data
 brexit.directive('loadUserData', function ($parse) {
   return {
     restrict: 'E',
@@ -299,13 +339,12 @@ brexit.directive('loadUserData', function ($parse) {
       );
 
       $("#button-old-user").click(function (e) {
-        scope.loadUserData("../data/user_info.json"); // api/me/info
+        scope.loadUserData("../data/user_info.json");
       });
 
     }};
 
 }); 
-
 
 // Whenever this element is preent on the page load user data in the global scope
 brexit.directive('loadAllData', function ($parse) {
@@ -314,13 +353,11 @@ brexit.directive('loadAllData', function ($parse) {
     replace: false,
     link: function (scope, element, attrs) {
 
-      // scope.loadAllData("../data/all.json"); // api/all
-      scope.loadAllData("../data/all_new.json"); // version for new user
+      scope.loadAllData("api/all");
 
     }};
 
 }); 
-
 
 brexit.directive('ageGroup', function ($parse) {
   return {
@@ -650,6 +687,10 @@ brexit.directive('buttonVote', function ($parse) {
         // TODO: UNDER ONE SESSION, USER CAN SUBMIT AS MANY ANSWERS AS HE WANTS, EVEN IF THEY ARE ALL THE SAME! 
         // TODO: IF USER CHANGES HIS VOTE AND THEN RETURNS THE OLD VALUES BEFORE SUBMITTING, HE WILL BE ABLE TO SUBMIT ALTHOUGH ANSWERS ARE THE SAME!
 
+        // (scope.user_info.postcode || scope.initial_user_info.postcode ) && 
+        // (scope.postcode_check.status == 200) && // postcode should be validated through postcode.io
+        //  (scope.user_info.region || scope.initial_user_info.region ) && // ( !(typeof scope.user_info.region === "undefined") || !(typeof scope.initial_user_info.region === "undefined") ) && // region should be defined
+
         if ( (scope.user_info.age_group || scope.initial_user_info.age_group ) && // age_group should be defined
              ( !(typeof scope.user_info.region === "undefined") || !(typeof scope.initial_user_info.region === "undefined") ) && // region should be defined             
              (scope.user_info.vote || scope.initial_user_info.vote ) && // vote should be defined
@@ -661,6 +702,7 @@ brexit.directive('buttonVote', function ($parse) {
           // All values which are not set by the user in this session should be taken from initialization
           var age_group = scope.user_info.age_group ? scope.user_info.age_group : scope.initial_user_info.age_group;
           var region = scope.user_info.region ? scope.user_info.region : scope.initial_user_info.region;
+          // var postcode = scope.user_info.postcode ? scope.user_info.postcode : scope.initial_user_info.postcode;
           var vote = scope.user_info.vote ? scope.user_info.vote : scope.initial_user_info.vote;
           var meta1 = scope.user_info.meta1 || scope.user_info.meta1==0 ? scope.user_info.meta1 : scope.initial_user_info.meta1;
           var meta2 = scope.user_info.meta2 || scope.user_info.meta2==0 ? scope.user_info.meta2 : scope.initial_user_info.meta2;
@@ -673,10 +715,11 @@ brexit.directive('buttonVote', function ($parse) {
 
           $('#current-vote-label').html('You vote to ' + voteParsed + ' (constituency "' + constituency + '", region "' + scope.codeToRegion[region.region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
           // $('#current-vote-label').html('You vote to ' + voteParsed + ' (constituency "' + region.constituency + '", region "' + scope.codeToRegion[region.region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
+          // $('#current-vote-label').html('You vote to ' + voteParsed + ' (postcode ' + postcode + ', region "' + scope.codeToRegion[region] + '", age ' + scope.codeToAge[age_group] + ') and your percentages are ' + meta1 + '% and ' + meta2 + '%.');
         
           user_vote({'vote': vote, 
                      'age_group': age_group,
-                     'region': {'code':region.code,'region':region.region},
+                     'region': {'code':region.code,'region':region.region}, // 'postcode': postcode,
                      'meta1': meta1,
                      'meta2': meta2
                     });
@@ -692,8 +735,15 @@ brexit.directive('buttonVote', function ($parse) {
         var constituency = _.pluck(_.where(scope.constituency_region,{'code':d.region.code}), 'constituency');
         console.log('You vote to ' + scope.codeToVote[d.vote] + ' (constituency "' + constituency + '", region "' + scope.codeToRegion[d.region.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
         // console.log('You vote to ' + scope.codeToVote[d.vote] + ' (constituency "' + d.region.constituency + '", region "' + scope.codeToRegion[d.region.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
+        // console.log('You vote to ' + scope.codeToVote[d.vote] + ' (postcode ' + d.postcode + ', region "' + scope.codeToRegion[d.region] + '", age ' + scope.codeToAge[d.age_group] + ') and your percentages are ' + d.meta1 + '% and ' + d.meta2 + '%.');
 
         scope.sendAnswers("api/send_answers",d);
+
+        // NOTE: On production this goes into sendAnswers() success callback!
+        $('#results').show(1000);
+        scope.getVotes("../data/votes_users.json");
+        scope.getVotesInTime("../data/votes_in_time.json");
+        scope.getVotesRegions("../data/votes_regions.json");
 
       }
 
@@ -1332,8 +1382,7 @@ brexit.directive('findRegion', function ($parse) {
       '<input id="region-input" class="typeahead" type="text" placeholder="Start typing your constituency...">'
       );
 
-      // TODO: For now we will load this through api/all, automatically after login
-      // scope.getConstituencyRegion(attrs.url);
+      scope.getConstituencyRegion(attrs.url);
 
       scope.$watch('constituency_region', function (newData, oldData) {
 
@@ -1400,6 +1449,134 @@ brexit.directive('findRegion', function ($parse) {
 
 }); 
 
+
+brexit.directive('findRegion2', function ($parse) {
+  return {
+    restrict: 'E',
+    replace: false,
+    link: function (scope, element, attrs) {
+
+      $(element).html(
+        '<div class="col-xs-8">'+
+          '<div class="input-group">' +
+            '<input id="region-input2" type="text" class="form-control" placeholder="Start typing your postal code..." maxlength="7">' +
+            '<span class="input-group-btn">' +
+              '<button id="button-check-postcode" class="btn btn-sm btn-default">Check postcode</button>' +
+            '</span>' +
+          '</div>' +
+          '<p id="postcode-validity-label"></p>' +
+          '<p id="region-label"></p>' +
+        '</div>'
+      );
+
+
+      $("#button-check-postcode").click(function (e) {
+        scope.checkPostalCode($("#region-input2").val().toUpperCase().replace(/ /g, ''));
+      });
+
+      scope.getPostalCodes(attrs.url);
+
+      scope.$watch('postcodes_region_lookup', function (newData, oldData) {
+
+        if (!newData) { return; }
+
+        var postcodes_region_lookup = newData;
+
+        $("#region-input2").on('keyup', function(e) {
+
+          $('#region-label').empty();
+          $('#postcode-validity-label').empty();
+          scope.setRegion(0);
+
+          // Postcodes are usually written in uppercase and with whitespaces, so we compensate for that
+          var postcode_parsed = $("#region-input2").val().toUpperCase().replace(/ /g, '');
+
+          scope.setPostcode(postcode_parsed);
+          scope.setPostcodeCheck(false);
+
+          var temp = postcodes_region_lookup;
+          for (var i=0; i < postcode_parsed.length; i++) { 
+            if (!(typeof temp[postcode_parsed.charAt(i)] === "undefined")) {
+              // If partial postcode corresponds to one unique region
+              // NOTE: As we don't have full lookup table for all postcodes, we cannot know whether
+              // the whole postcode is valid, just that the first part leads to uniquelly defined region!
+              if ( !$.isPlainObject(temp[postcode_parsed.charAt(i)]) && !(typeof temp[postcode_parsed.charAt(i)] === "undefined") ) {
+                $('#region-label').text('Suggested region for postcode ' + postcode_parsed + ' is "' + scope.codeToRegion[temp[postcode_parsed.charAt(i)]] + '". Please check the validity of postcode before your submission.');
+                scope.setRegion(temp[postcode_parsed.charAt(i)]);
+                break;
+              // If partial postcode does not lead to uniquelly defined region continue search.
+              // NOTE: As we don't have full lookup table for all postcodes, we cannot know whether
+              // this postcode is actually invalid, just that we didn't find a match.
+              } else {
+                temp = temp[postcode_parsed.charAt(i)];
+              } 
+            } else {
+              break;
+            }
+          }
+
+        });
+      
+      });
+
+      scope.$watch('initial_user_info.region', function (newData, oldData) {
+
+        if (!newData) { return; }
+
+        // $('#region-label').text('Your region is ' + scope.codeToRegion[newData] + '.');
+        $('#region-label').text('Your postcode is ' + scope.initial_user_info.postcode + ' and your region is "' + scope.codeToRegion[newData] + '". Please check the validity of postcode before your submission.');
+        
+      });
+
+      scope.$watch('initial_user_info.postcode', function (newData, oldData) {
+
+        if (!newData) { return; }
+
+        $("#region-input2").val(newData)
+        
+      });
+
+      scope.$watch('postcode_check', function (newData, oldData) {
+
+        if (!newData) { return; }
+
+        var postcode_check = newData;
+
+        // If status is false clear the label
+        if (!postcode_check.status) {
+          $('#postcode-validity-label').empty();
+          return;
+        }
+
+        // postcode_check.status: 200 (OK), 400 (bad request), 404 (not found), 500 (server error)
+        // postcode_check.result: true, false
+
+        var glyphiconOk = '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>';
+        var glyphiconRemove = '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>';
+
+        if (postcode_check.status == 200) {
+          $('#postcode-validity-label').html('<p>Postcode ' + postcode_check.postcode + ' is valid!  ' + glyphiconOk + '</p>');
+          // if (postcode_check.result = true) {
+          //   $('#region-label').text('Postcode is valid!');
+          // } else {
+          //   $('#region-label').text('Postcode is not valid! :-(');
+          // }
+        } else if (postcode_check.status == 404) {
+            // $('#postcode-validity-label').text('Sorry, postcode ' + postcode_check.postcode + ' is not valid!');
+            // $('#postcode-validity-label').append($('<p>').html(glyphiconRemove));
+            $('#postcode-validity-label').html('<p>Sorry, postcode ' + postcode_check.postcode + ' is not valid!  ' + glyphiconRemove + '</p>');
+        } else if (postcode_check.status == 400) {
+            $('#postcode-validity-label').html('<p>Sorry, postcode ' + postcode_check.postcode + ' is not found!  ' + glyphiconRemove + '</p>');
+        } else if (postcode_check.status == 500) {
+            $('#postcode-validity-label').html('<p>Sorry, there is an error at performing postcode validation!  ' + glyphiconRemove + '</p>');
+        }
+
+      });
+
+
+    }};
+
+}); 
 
 
 brexit.directive('mapStatistics', function ($parse) {
