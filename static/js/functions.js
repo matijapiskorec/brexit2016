@@ -292,7 +292,7 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
 
 
 // ONLY FOR TESTING: Buttons for mockup loading of user data
-brexit.directive('loadUserData', function ($parse) {
+brexit.directive('loadUserData', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -308,11 +308,11 @@ brexit.directive('loadUserData', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
 // Whenever this element is preent on the page load user data in the global scope
-brexit.directive('loadAllData', function ($parse) {
+brexit.directive('loadAllData', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -323,10 +323,10 @@ brexit.directive('loadAllData', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('ageGroup', function ($parse) {
+brexit.directive('ageGroup', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -363,10 +363,10 @@ brexit.directive('ageGroup', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('questionReferendum', function ($parse) {
+brexit.directive('questionReferendum', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -473,10 +473,10 @@ brexit.directive('questionReferendum', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('questionMeta1', function ($parse) {
+brexit.directive('questionMeta1', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -550,10 +550,10 @@ brexit.directive('questionMeta1', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('questionMeta2', function ($parse) {
+brexit.directive('questionMeta2', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -627,10 +627,10 @@ brexit.directive('questionMeta2', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('buttonVote', function ($parse) {
+brexit.directive('buttonVote', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -700,9 +700,9 @@ brexit.directive('buttonVote', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
-brexit.directive('results', function ($parse) {
+brexit.directive('results', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -756,10 +756,10 @@ brexit.directive('results', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('questionExtra', function ($parse) {
+brexit.directive('questionExtra', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -862,10 +862,10 @@ brexit.directive('questionExtra', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('percentageTotal', function ($parse) {
+brexit.directive('percentageTotal', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -1030,10 +1030,10 @@ brexit.directive('percentageTotal', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('percentageFriends', function ($parse) {
+brexit.directive('percentageFriends', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -1199,11 +1199,11 @@ brexit.directive('percentageFriends', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
 
-brexit.directive('votesInTime', function ($parse) {
+brexit.directive('votesInTime', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -1321,11 +1321,11 @@ brexit.directive('votesInTime', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
 
-brexit.directive('findRegion', function ($parse) {
+brexit.directive('findRegion', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -1401,11 +1401,11 @@ brexit.directive('findRegion', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
 
-brexit.directive('mapStatistics', function ($parse) {
+brexit.directive('mapStatistics', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -1460,10 +1460,10 @@ brexit.directive('mapStatistics', function ($parse) {
 
     }};
 
-}); 
+}]); 
 
 
-brexit.directive('predictions', function ($parse) {
+brexit.directive('predictions', ['$parse', function ($parse) {
   return {
     restrict: 'E',
     replace: false,
@@ -1726,4 +1726,4 @@ brexit.directive('predictions', function ($parse) {
 
     }};
 
-}); 
+}]); 

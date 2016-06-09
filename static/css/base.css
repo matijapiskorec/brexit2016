@@ -67,17 +67,65 @@ predictions p {
     min-height: 2.2em;
 }
 
-/*.results-hidden {
+
+/* Charts and visualizations */
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
   display: none;
 }
 
-.results-visible {
-  display: inline-block;
-}*/
+.y.axis path {
+  display: none;
+}
 
-/*.map-label {
-  position: absolute;
-  width: 10px;
-  font-size: 30px;
-  font-family: "Times New Roman";
-}*/
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+
+path.slice {
+  stroke-width:1px;
+  stroke: black;
+}
+
+polyline {
+  opacity: .5;
+  stroke: black;
+  stroke-width: 1px;
+  fill: none;
+}
+
+
+#div1 .dygraph-legend {
+  width: 200px;
+  background-color: transparent !important;
+  left: 80px !important;
+  top: 10px !important;
+}
+
+#div2 .dygraph-legend {
+  width: 900px !important;
+  background-color: transparent !important;
+  left: 60px !important;
+  top: 4px !important;
+}
+
+#div3 .dygraph-legend {
+  width: 900px !important;
+  background-color: transparent !important;
+  left: 60px !important;
+  top: 4px !important;
+}
