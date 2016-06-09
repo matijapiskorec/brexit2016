@@ -4,8 +4,6 @@ var brexit = angular.module('brexit', []);
 brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
 
     $scope.user_info = {};
-    // $scope.user_info = {'meta1':0,'meta2':0};
-    // $scope.initial_user_info = {'meta1':0,'meta2':0};
 
     $scope.codeToRegion = {
           'C': 'North East England',
@@ -88,6 +86,7 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       $scope.$apply();
     };
 
+    // Get voting statistics
     $scope.getVotes = function(url) {
       $http({url: url, method: 'GET'})
         .success(function (data) {
@@ -105,7 +104,12 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
         });
     };
 
+    // TODO: TOKEN AUTHENTIFICATION IN ANGULAR:
+    //       https://auth0.com/blog/2014/01/07/angularjs-authentication-with-cookies-vs-token/
+    //       https://docs.angularjs.org/api/ng/service/$http
     // TODO: TOKEN IS INJECTED BY SERVER INTO THE TEMPLATE, AND STORED IN document.cookie.
+    
+    // Send answers back to server
     $scope.sendAnswers = function(url,data) {
       $http({url: url, 
              data: data, 
@@ -179,6 +183,7 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
           // If user voted already (a returning user who voted) show him all the statistics
           if ( data.vote && (data.meta1 || data.meta1==0 ) && 
                (data.meta2 || data.meta2==0 ) && !(typeof data.region === "undefined") ) {
+            
             $('#results').show(1000);
             
             $scope.getVotes("../data/votes_users.json"); // api/global/votes // api/friends/votes
@@ -264,9 +269,6 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
         });
     };
 
-    // TODO: THIS SHOULD BE LOADED FROM SERVER WITH AJAX CALL!
-    $scope.totalNumberOfVotes = Math.floor(Math.random()*10000);
-
     // Get data on constituency and their corresponding regions
     $scope.getConstituencyRegion = function(url) {
       $http({url: url, method: 'GET'})
@@ -283,6 +285,8 @@ brexit.controller('brexitCtrl', ['$scope', '$http', function ($scope, $http) {
       });
     };
 
+    // TODO: THIS SHOULD BE LOADED FROM SERVER WITH AJAX CALL!
+    $scope.totalNumberOfVotes = Math.floor(Math.random()*10000);
 
 }]);
 
@@ -369,10 +373,10 @@ brexit.directive('questionReferendum', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-          '<button id="btn_remain" class="btn btn-large btn-default" type="button" style="Width:120px;font-size:x-large;margin:10px 20px 10px 20px;">'+
+          '<button id="btn_remain" class="btn btn-lg btn-default" type="button" style="Width:120px;margin:10px 20px 10px 20px;">'+
             'Remain'+
           '</button>'+
-          '<button id="btn_leave" class="btn btn-large btn-default" style="Width:120px;font-size:x-large;margin:10px 20px 10px 20px;" type="button">'+
+          '<button id="btn_leave" class="btn btn-lg btn-default" style="Width:120px;margin:10px 20px 10px 20px;" type="button">'+ 
             'Leave'+
           '</button>'
       );
@@ -479,7 +483,7 @@ brexit.directive('questionMeta1', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>Estimate the precentage of votes that <span id="vote-label-meta1">your option</span> will get in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
+        '<h3>4. Estimate the precentage of votes that <span id="vote-label-meta1">your option</span> will get in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta1" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -489,8 +493,8 @@ brexit.directive('questionMeta1', function ($parse) {
 
       // NOTE: It is impossible to select values close to the tick marks, so that's why we left only 0% and 100%
       $("#question-meta1").slider({
-        ticks: [0, 100], // ticks: [0, 25, 50, 75, 100],
-        ticks_labels: ['0%','100%'], // ticks_labels: ['0%', '25%', '50%', '75%', '100%'],
+        ticks: [0, 100],
+        ticks_labels: ['0%','100%'],
         ticks_snap_bounds: 1
       }
       );
@@ -556,7 +560,7 @@ brexit.directive('questionMeta2', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>Estimate the precentage of votes that <span id="vote-label-meta2">your option</span> will get in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
+        '<h3>5. Estimate the precentage of votes that <span id="vote-label-meta2">your option</span> will get in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta2" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -566,8 +570,8 @@ brexit.directive('questionMeta2', function ($parse) {
 
       // NOTE: It is impossible to select values close to the tick marks, so that's why we left only 0% and 100%
       $("#question-meta2").slider({
-        ticks: [0, 100], // ticks: [0, 25, 50, 75, 100],
-        ticks_labels: ['0%','100%'], // ticks_labels: ['0%', '25%', '50%', '75%', '100%'],
+        ticks: [0, 100],
+        ticks_labels: ['0%','100%'],
         ticks_snap_bounds: 1
       }
       );
@@ -636,7 +640,7 @@ brexit.directive('buttonVote', function ($parse) {
         '<div style="height:5px;clear:both;"></div>' +
         '<p id="current-vote-label"></p>' +
         '<div style="height:5px;clear:both;"></div>' +
-        '<button id="button-vote" class="btn btn-lg btn-default">Vote</button>'
+        '<button id="button-vote" class="btn btn-lg btn-default">Submit answers</button>'
       );
 
       $("#button-vote").click(function (e) {
@@ -709,7 +713,7 @@ brexit.directive('results', function ($parse) {
         if (!newData) { return; }
         // var friends_data = newData;
 
-        $(element).show(1000);
+        // $(element).show(1000); // We show the results in loadUserData() after successfull retrieval of user votes
 
         if ($('.rank').text()=="") {
           $('#span-reach').remove();
@@ -746,6 +750,112 @@ brexit.directive('results', function ($parse) {
         
         if ($('.rank-shares').text()=='N/A.') {
           $('#reach-rank-label').empty();
+        }
+
+      });
+
+    }};
+
+}); 
+
+
+brexit.directive('questionExtra', function ($parse) {
+  return {
+    restrict: 'E',
+    replace: false,
+    link: function (scope, element, attrs) {
+
+      $(element).html(
+        '<h3>6. Your education</h3>'+
+        '<select id="question-education" class="selectpicker">'+
+          '<option value="0">Primary education</option>'+
+          '<option value="1">Secondary education</option>'+
+          '<option value="2">University - bachelor\'s degree</option>'+
+          '<option value="3">University - master\'s degree</option>'+
+          '<option value="4">University - doctoral degree</option>'+
+        '</select>'+
+        '<div style="height:5px;clear:both;"></div>' +
+        '<h3>7. Who did you vote for at the 2015 UK general election?</h3>'+
+        '<select id="question-party" class="selectpicker">'+
+          '<option value="0">Conservative Party</option>'+
+          '<option value="1">Labour Party</option>'+
+          '<option value="2">Scottish National Party</option>'+
+          '<option value="3">Liberal Democrats</option>'+
+          '<option value="4">UK Independance Party</option>'+
+          '<option value="5">Other</option>'+
+          '<option value="6">I did not vote</option>'+
+        '</select>'+
+        '<div style="height:5px;clear:both;"></div>' +
+        '<p id="vote-extra-label"></p>' +
+        '<div style="height:5px;clear:both;"></div>' +
+        '<button id="button-vote-extra" class="btn btn-lg btn-default">Submit extra answers</button>'+
+        '<div style="height:5px;clear:both;"></div>'
+      );
+
+      $('#question-education').selectpicker({
+        title: 'Choose your education...'
+      });
+
+      $('#question-education').on('change', function(){
+        scope.setEducation($(this).find("option:selected").val());
+      });
+
+      $('#question-party').selectpicker({
+        title: 'Choose your party...'
+      });
+
+      $('#question-party').on('change', function(){
+        scope.setParty($(this).find("option:selected").val());
+      });
+
+
+      scope.$watch('initial_user_info.education', function (newData, oldData) {
+        if (!newData) { return; }
+        $("#question-education").selectpicker('val', newData);
+        console.log('Initial education is set to ' + scope.codeToEducation[newData]);
+      });
+
+      scope.$watch('user_info.education', function (newData, oldData) {
+        if (!newData) { return; }
+        console.log('User choose education ' + scope.codeToEducation[newData]);
+      });
+
+      scope.$watch('initial_user_info.party', function (newData, oldData) {
+        if (!newData) { return; }
+        $("#question-party").selectpicker('val', newData);
+        console.log('Initial party is set to ' + scope.codeToParty[newData]);
+      });
+
+      scope.$watch('user_info.party', function (newData, oldData) {
+        if (!newData) { return; }
+        console.log('User choose party ' + scope.codeToParty[newData]);
+      });
+
+      $("#button-vote-extra").click(function (e) {
+
+        if ( scope.user_info.education || scope.initial_user_info.education || scope.user_info.party || scope.initial_user_info.party ) {
+
+          // All values which are not set by the user in this session should be taken from initialization
+          var education = scope.user_info.education ? scope.user_info.education : scope.initial_user_info.education;
+          var party = scope.user_info.party ? scope.user_info.party : scope.initial_user_info.party;
+
+          var extra_answers = {};
+          extra_answers.user_id = user_id; // This is supposed to be injected into main login template.
+
+          if ( !(typeof education === "undefined") ) {
+            extra_answers.education = education;
+          }
+          if ( !(typeof party === "undefined") ) {
+            extra_answers.party = party;
+          }
+
+          // Send answers to extra questiona back to the server
+          scope.sendAnswersExtra("api/answer/extra",extra_answers);
+
+          $('#vote-extra-label').html('Your answers are submitted!');
+
+        } else {
+          $('#vote-extra-label').html('<span style="color:red">Please fill in at least one answer before submitting!</span>');
         }
 
       });
@@ -1091,111 +1201,6 @@ brexit.directive('percentageFriends', function ($parse) {
 
 }); 
 
-
-brexit.directive('questionExtra', function ($parse) {
-  return {
-    restrict: 'E',
-    replace: false,
-    link: function (scope, element, attrs) {
-
-      $(element).html(
-        '<h3>Your education</h3>'+
-        '<select id="question-education" class="selectpicker">'+
-          '<option value="0">Primary education</option>'+
-          '<option value="1">Secondary education</option>'+
-          '<option value="2">University - bachelor\'s degree</option>'+
-          '<option value="3">University - master\'s degree</option>'+
-          '<option value="4">University - doctoral degree</option>'+
-        '</select>'+
-        '<div style="height:5px;clear:both;"></div>' +
-        '<h3>Who did you vote for at the 2015 UK general election?</h3>'+
-        '<select id="question-party" class="selectpicker">'+
-          '<option value="0">Conservative Party</option>'+
-          '<option value="1">Labour Party</option>'+
-          '<option value="2">Scottish National Party</option>'+
-          '<option value="3">Liberal Democrats</option>'+
-          '<option value="4">UK Independance Party</option>'+
-          '<option value="5">Other</option>'+
-          '<option value="6">I did not vote</option>'+
-        '</select>'+
-        '<div style="height:5px;clear:both;"></div>' +
-        '<p id="vote-extra-label"></p>' +
-        '<div style="height:5px;clear:both;"></div>' +
-        '<button id="button-vote-extra" class="btn btn-lg btn-default">Submit extra answers</button>'+
-        '<div style="height:5px;clear:both;"></div>'
-      );
-
-      $('#question-education').selectpicker({
-        title: 'Choose your education...'
-      });
-
-      $('#question-education').on('change', function(){
-        scope.setEducation($(this).find("option:selected").val());
-      });
-
-      $('#question-party').selectpicker({
-        title: 'Choose your party...'
-      });
-
-      $('#question-party').on('change', function(){
-        scope.setParty($(this).find("option:selected").val());
-      });
-
-
-      scope.$watch('initial_user_info.education', function (newData, oldData) {
-        if (!newData) { return; }
-        $("#question-education").selectpicker('val', newData);
-        console.log('Initial education is set to ' + scope.codeToEducation[newData]);
-      });
-
-      scope.$watch('user_info.education', function (newData, oldData) {
-        if (!newData) { return; }
-        console.log('User choose education ' + scope.codeToEducation[newData]);
-      });
-
-      scope.$watch('initial_user_info.party', function (newData, oldData) {
-        if (!newData) { return; }
-        $("#question-party").selectpicker('val', newData);
-        console.log('Initial party is set to ' + scope.codeToParty[newData]);
-      });
-
-      scope.$watch('user_info.party', function (newData, oldData) {
-        if (!newData) { return; }
-        console.log('User choose party ' + scope.codeToParty[newData]);
-      });
-
-      $("#button-vote-extra").click(function (e) {
-
-        if ( scope.user_info.education || scope.initial_user_info.education || scope.user_info.party || scope.initial_user_info.party ) {
-
-          // All values which are not set by the user in this session should be taken from initialization
-          var education = scope.user_info.education ? scope.user_info.education : scope.initial_user_info.education;
-          var party = scope.user_info.party ? scope.user_info.party : scope.initial_user_info.party;
-
-          var extra_answers = {};
-          extra_answers.user_id = user_id; // This is supposed to be injected into main login template.
-
-          if ( !(typeof education === "undefined") ) {
-            extra_answers.education = education;
-          }
-          if ( !(typeof party === "undefined") ) {
-            extra_answers.party = party;
-          }
-
-          // Send answers to extra questiona back to the server
-          scope.sendAnswersExtra("api/answer/extra",extra_answers);
-
-          $('#vote-extra-label').html('Your answers are submitted!');
-
-        } else {
-          $('#vote-extra-label').html('<span style="color:red">Please fill in at least one answer before submitting!</span>');
-        }
-
-      });
-
-    }};
-
-}); 
 
 
 brexit.directive('votesInTime', function ($parse) {

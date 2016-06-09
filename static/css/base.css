@@ -43,6 +43,30 @@
   width: 380px;
 }
 
+h1, h2, h3, p, input, button, select, .btn, .navbar-brand {
+  font-family: "Lato", Arial, sans-serif;
+}
+
+.row {
+    margin-top: 2em;
+}
+
+.container h2 {
+    font-weight: bold;
+}
+
+.row h3 {
+    line-height: 1.25em;
+}
+
+predictions p {
+    margin-top: 3em;
+}
+
+#region-input {
+    min-height: 2.2em;
+}
+
 /*.results-hidden {
   display: none;
 }
@@ -51,9 +75,9 @@
   display: inline-block;
 }*/
 
-.map-label {
+/*.map-label {
   position: absolute;
   width: 10px;
   font-size: 30px;
   font-family: "Times New Roman";
-}
+}*/

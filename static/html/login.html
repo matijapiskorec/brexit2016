@@ -23,7 +23,8 @@
 <title>brexit.oraclum.co.uk</title>
 
 <link rel="shortcut icon" href="../images/brexit.ico" />
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+<!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="../css/bootstrap.min.css">
 <!-- <link rel="stylesheet"
   href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css"> -->
 
@@ -35,9 +36,12 @@
 
 <script src="../js/angular.min.js"></script>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+<script src="../js/d3.v3.min.js"></script>
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> -->
+<script src="../js/jquery.min.js"></script>
+<!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script> -->
+<script src="../js/bootstrap.min.js"></script>
 
 <script src="../js/functions.js"></script>
 <script src="../js/lodash.min.js"></script>
@@ -50,6 +54,8 @@
 <link rel="stylesheet" href="../css/typeahead.css" type="text/css" media="all" />
 
 <script type="text/javascript" src="../js/dygraph-Brexit.js"></script>
+
+<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
 <script>
 // TODO: I EXPECT THIS TO BE INJECTED BY THE SERVER PLEASE!
@@ -96,23 +102,21 @@ var user_id = "SuperSecretUserID";
     <h2>Questions</h2>
 
       <div class="col-md-6">
-        <h3>Your age group</h3>
+        <h3>1. Your age group</h3>
         <age-group></age-group>
       </div>
 
-      <div class="row">
-        <div class="col-md-6">
-          <h3>Your region</h3>
-          <p>Please find your region by entering your constituency. Not sure which is your constituency? Check <a href="http://www.electoralcalculus.co.uk/newseatlookup.html">here</a> or <a href="http://www.parliament.uk/mps-lords-and-offices/mps/">here</a>.</p>
-          <find-region url="../data/code_constituency_region.json"></find-region>
-        </div>
+      <div class="col-md-6">
+        <h3>2. Your region</h3>
+        <p>Please find your region by entering your constituency. Not sure which is your constituency? Check <a href="http://www.electoralcalculus.co.uk/newseatlookup.html">here</a> or <a href="http://www.parliament.uk/mps-lords-and-offices/mps/">here</a>.</p>
+        <find-region url="../data/code_constituency_region.json"></find-region>
       </div>
 
     </div>
 
     <div class="row">
       <div class="col-md-12">
-        <h3>How will you vote on the Brexit referendum?</h3>
+        <h3>3. How will you vote on the Brexit referendum?</h3>
         <question-referendum></question-referendum>
       </div>
     </div>
@@ -147,6 +151,7 @@ var user_id = "SuperSecretUserID";
       <hr/>
 
       <div class="row">
+
         <div class="col-md-6">
 
           <h2>Total results</h2>
@@ -157,8 +162,8 @@ var user_id = "SuperSecretUserID";
           <!-- <p><span id="total-votes" class="badge"></span> users voted.</p> -->
           <a class="btn btn-default" href="" target="_blank" onClick="return fbs_click(400, 300)"><i class="fa fa-facebook">  Share on Facebook</i></a>
 
-
         </div>
+
         <div class="col-md-6">
 
           <h2>Results for your friends</h2>
@@ -171,27 +176,31 @@ var user_id = "SuperSecretUserID";
 
           <a class="btn btn-default" href="" target="_blank" onClick="return fbs_click(400, 300)"><i class="fa fa-facebook">  Share on Facebook</i></a>
 
-
         </div>
+
       </div>
 
-      <div class="col-md-12">
+      <div class="row">
 
-          <h2>Results in time</h2>
+        <div class="col-md-12">
 
-          <votes-in-time></votes-in-time>
+            <h2>Results in time</h2>
 
-          <h2>Results in regions</h2>
+            <votes-in-time></votes-in-time>
 
-          <map-statistics></map-statistics>
+            <h2>Results in regions</h2>
 
-          <!-- NOTE: For some reason predictions are not rendered properly when inside results element! -->
-          <!-- <h2>Predictions</h2> -->
-          <!-- <predictions></predictions> -->
+            <map-statistics></map-statistics>
 
-          <h2>Network of users</h2>
-          <img src="../images/network-facebook-1.png" width="600px"/>
-          <p>Network snapshot taken at time: 2016-06-06 12:00</p>
+            <!-- NOTE: For some reason predictions are not rendered properly when inside results element! -->
+            <!-- <h2>Predictions</h2> -->
+            <!-- <predictions></predictions> -->
+
+            <h2>Network of users</h2>
+            <img src="../images/network-facebook-1.png" width="600px"/>
+            <p>Network snapshot taken at time: 2016-06-06 12:00</p>
+
+        </div>
 
       </div>
 
