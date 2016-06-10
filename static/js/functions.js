@@ -483,7 +483,7 @@ brexit.directive('questionMeta1', ['$parse', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>4. Estimate the precentage of votes that <span id="vote-label-meta1">your option</span> will get in <span id="region-label-meta1">your region</span> ON THE ACTUAL REFERENDUM.</h3>' +
+        '<h3>4. What percentage (0-100%) of the population of <span id="region-label-meta1">your region</span>, do you predict will vote <span id="vote-label-meta1">like you</span>?</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta1" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -507,9 +507,6 @@ brexit.directive('questionMeta1', ['$parse', function ($parse) {
         $('#meta-label1').text('You have chosen ' + e.value.newValue + '%.');
       });
 
-      // // Set initial value to zero (this is also valid and can be submitted!)
-      // scope.setMeta1(0);
-
      scope.$watchGroup(['user_info.vote','initial_user_info.vote'], function (newData, oldData) {
 
         if (!newData[0] && !newData[1]) { return; }
@@ -522,19 +519,26 @@ brexit.directive('questionMeta1', ['$parse', function ($parse) {
                           (vote=='R' ? '#4575b4' : '#f11b1b') +
                          '">' + scope.codeToVote[vote].toUpperCase() + '</span>';
 
-        $('#vote-label-meta1').html(voteParsed);
+        $('#vote-label-meta1').html('to ' + voteParsed + ' in the EU');
 
       });
 
-      scope.$watchGroup(['user_info.region','initial_user_info.region'], function (newData, oldData) {
 
-        if (!newData[0] && !newData[1]) { return; }
-
+      scope.$watchGroup(['user_info.region','initial_user_info.region','user_info.vote','initial_user_info.vote'], function (newData, oldData) {
+        if (!newData[0] && !newData[1]  && !newData[2] && !newData[3]) { return; }
         var region = newData[0] || newData[1];
+        var vote = newData[2] || newData[3];
 
-        // console.log('#region-label-meta1 = ' + scope.codeToRegion[region.region]);
+        if ( !(typeof region === "undefined") ) {
 
-        $('#region-label-meta1').html(scope.codeToRegion[region.region]);
+          // Color of the region text corresponds to vote
+          var regionParsed = '<span style="color:' + 
+                    (vote=='R' ? '#4575b4' : '#f11b1b') +
+                   '">' + scope.codeToRegion[region.region] + '</span>';
+
+          $('#region-label-meta1').html(regionParsed);
+
+        }
 
       });
 
@@ -560,7 +564,7 @@ brexit.directive('questionMeta2', ['$parse', function ($parse) {
     link: function (scope, element, attrs) {
 
       $(element).html(
-        '<h3>5. Estimate the precentage of votes that <span id="vote-label-meta2">your option</span> will get in <span id="region-label-meta2">your region</span> ON THIS POLL.</h3>' +
+        '<h3>5. How do you believe that others in <span id="region-label-meta2">your region</span> would respond to the previous question (in percentages, 0-100%)?</h3>' +
         '<div class="slider-row">' +
         '<input id="question-meta2" type="text" data-slider-min="0"' + 
         ' data-slider-max="100" data-slider-step="1" data-slider-value="0" />' +
@@ -584,34 +588,21 @@ brexit.directive('questionMeta2', ['$parse', function ($parse) {
         $('#meta-label2').text('You have chosen ' + e.value.newValue + '%.');
       });
 
-      // // Set initial value to zero (this is also valid and can be submitted!)
-      // scope.setMeta2(0);
-
-     scope.$watchGroup(['user_info.vote','initial_user_info.vote'], function (newData, oldData) {
-
-        if (!newData[0] && !newData[1]) { return; }
-
-        var vote = newData[0] || newData[1];
-
-        console.log('#vote-label-meta2 = ' + vote);
-
-        var voteParsed = '<span style="color:' + 
-                          (vote=='R' ? '#4575b4' : '#f11b1b') +
-                         '">' + scope.codeToVote[vote].toUpperCase() + '</span>';
-
-        $('#vote-label-meta2').html(voteParsed);
-
-      });
-
-      scope.$watchGroup(['user_info.region','initial_user_info.region'], function (newData, oldData) {
-
-        if (!newData[0] && !newData[1]) { return; }
-
+      scope.$watchGroup(['user_info.region','initial_user_info.region','user_info.vote','initial_user_info.vote'], function (newData, oldData) {
+        if (!newData[0] && !newData[1]  && !newData[2] && !newData[3]) { return; }
         var region = newData[0] || newData[1];
+        var vote = newData[2] || newData[3];
 
-        // console.log('#region-label-meta2 = ' + scope.codeToRegion[region.region]);
+        if ( !(typeof region === "undefined") ) {
 
-        $('#region-label-meta2').html(scope.codeToRegion[region.region]);
+          // Color of the region text corresponds to vote
+          var regionParsed = '<span style="color:' + 
+                    (vote=='R' ? '#4575b4' : '#f11b1b') +
+                   '">' + scope.codeToRegion[region.region] + '</span>';
+
+          $('#region-label-meta2').html(regionParsed);
+
+        }
 
       });
 
